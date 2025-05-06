@@ -1,60 +1,158 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
-import { products } from "@/data/products";
 import { Edit, Trash2, Plus, Image as ImageIcon } from "lucide-react";
+import AdminLogin from "@/components/AdminLogin";
+import ImageUploader from "@/components/ImageUploader";
+import CategorySelector from "@/components/CategorySelector";
+
+interface Product {
+  id: string;
+  name: string;
+  price: number;
+  image?: string;
+  category_id?: string;
+  stock: number;
+  presentation?: string;
+  discount?: number;
+  description?: string;
+  category?: {
+    name: string;
+  };
+}
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 const Admin = () => {
   const { toast } = useToast();
-  const [productList, setProductList] = useState(products);
-  const [editingProduct, setEditingProduct] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [productList, setProductList] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreating, setIsCreating] = useState(false);
 
-  const categories = Array.from(new Set(products.map(p => p.category)));
+  useEffect(() => {
+    // Check if admin is authenticated
+    const adminAuth = localStorage.getItem("admin_authenticated") === "true";
+    setIsAuthenticated(adminAuth);
+    
+    if (adminAuth) {
+      fetchProducts();
+      fetchCategories();
+    } else {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const handleEdit = (product: any) => {
+  const fetchProducts = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          *,
+          category:categories(name)
+        `)
+        .order("name");
+
+      if (error) throw error;
+      setProductList(data || []);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+      toast({
+        title: "Error",
+        description: "No se pudieron cargar los productos",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .order("name");
+
+      if (error) throw error;
+      setCategories(data || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const handleEdit = (product: Product) => {
     setEditingProduct({ ...product });
     setIsCreating(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: string) => {
     const confirmed = window.confirm("¿Estás seguro de que deseas eliminar este producto?");
     if (confirmed) {
-      setProductList(productList.filter(p => p.id !== id));
-      toast({
-        title: "Producto eliminado",
-        description: "El producto ha sido eliminado exitosamente.",
-      });
+      try {
+        const { error } = await supabase
+          .from("products")
+          .delete()
+          .eq("id", id);
+
+        if (error) throw error;
+
+        // Update the product list
+        setProductList(productList.filter(p => p.id !== id));
+        
+        toast({
+          title: "Producto eliminado",
+          description: "El producto ha sido eliminado exitosamente.",
+        });
+      } catch (error) {
+        console.error("Error deleting product:", error);
+        toast({
+          title: "Error",
+          description: "No se pudo eliminar el producto",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const handleCreateNew = () => {
     setEditingProduct({
-      id: Math.max(...productList.map(p => p.id)) + 1,
+      id: "",
       name: "",
       price: 0,
-      image: "https://images.unsplash.com/photo-1567892737950-30c7c8e1c863?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
-      category: categories[0],
+      image: "",
+      category_id: categories.length > 0 ? categories[0].id : undefined,
       stock: 0,
-      presentation: ""
+      presentation: "",
+      discount: 0,
+      description: ""
     });
     setIsCreating(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleChange = (key: string, value: any) => {
-    setEditingProduct({ ...editingProduct, [key]: value });
+    if (editingProduct) {
+      setEditingProduct({ ...editingProduct, [key]: value });
+    }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Simple validation
-    if (!editingProduct.name || editingProduct.price <= 0) {
+    if (!editingProduct?.name || editingProduct?.price <= 0) {
       toast({
         title: "Error de validación",
         description: "Por favor completa todos los campos requeridos.",
@@ -63,28 +161,89 @@ const Admin = () => {
       return;
     }
 
-    if (isCreating) {
-      // Add new product
-      setProductList([...productList, editingProduct]);
+    try {
+      if (isCreating) {
+        // Add new product
+        const { id, ...productData } = editingProduct;
+        const { data, error } = await supabase
+          .from("products")
+          .insert(productData)
+          .select();
+
+        if (error) throw error;
+
+        toast({
+          title: "Producto creado",
+          description: "El nuevo producto ha sido creado exitosamente.",
+        });
+
+        // Update product list
+        await fetchProducts();
+      } else {
+        // Update existing product
+        const { data, error } = await supabase
+          .from("products")
+          .update({
+            name: editingProduct.name,
+            price: editingProduct.price,
+            image: editingProduct.image,
+            category_id: editingProduct.category_id,
+            stock: editingProduct.stock,
+            presentation: editingProduct.presentation,
+            discount: editingProduct.discount,
+            description: editingProduct.description
+          })
+          .eq("id", editingProduct.id);
+
+        if (error) throw error;
+
+        toast({
+          title: "Producto actualizado",
+          description: "Los cambios han sido guardados exitosamente.",
+        });
+
+        // Update product list
+        await fetchProducts();
+      }
+
+      // Reset form
+      setEditingProduct(null);
+    } catch (error) {
+      console.error("Error saving product:", error);
       toast({
-        title: "Producto creado",
-        description: "El nuevo producto ha sido creado exitosamente.",
-      });
-    } else {
-      // Update existing product
-      setProductList(productList.map(p => p.id === editingProduct.id ? editingProduct : p));
-      toast({
-        title: "Producto actualizado",
-        description: "Los cambios han sido guardados exitosamente.",
+        title: "Error",
+        description: "No se pudo guardar el producto",
+        variant: "destructive",
       });
     }
-
-    // Reset form
-    setEditingProduct(null);
   };
 
   const handleCancel = () => {
     setEditingProduct(null);
+  };
+
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true);
+    fetchProducts();
+    fetchCategories();
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-grow">
+          <AdminLogin onLoginSuccess={handleLoginSuccess} />
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  const getCategoryName = (categoryId?: string) => {
+    if (!categoryId) return "-";
+    const category = categories.find(c => c.id === categoryId);
+    return category ? category.name : "-";
   };
 
   return (
@@ -121,21 +280,10 @@ const Admin = () => {
                   <label className="block text-nut-700 font-medium mb-2">
                     Categoría*
                   </label>
-                  <Select 
-                    value={editingProduct.category}
-                    onValueChange={(value) => handleChange("category", value)}
-                  >
-                    <SelectTrigger className="bg-white border-nut-200">
-                      <SelectValue placeholder="Seleccionar categoría" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <CategorySelector 
+                    value={editingProduct.category_id || ""}
+                    onChange={(value) => handleChange("category_id", value)}
+                  />
                 </div>
                 
                 <div>
@@ -189,15 +337,13 @@ const Admin = () => {
                   />
                 </div>
                 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-nut-700 font-medium mb-2">
-                    URL de la Imagen*
+                    Imagen*
                   </label>
-                  <Input 
-                    value={editingProduct.image}
-                    onChange={(e) => handleChange("image", e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="bg-white border-nut-200"
+                  <ImageUploader 
+                    value={editingProduct.image || ""}
+                    onChange={(url) => handleChange("image", url)}
                   />
                 </div>
                 
@@ -213,25 +359,6 @@ const Admin = () => {
                     className="bg-white border-nut-200"
                   />
                 </div>
-                
-                {editingProduct.image && (
-                  <div className="md:col-span-2">
-                    <label className="block text-nut-700 font-medium mb-2">
-                      Vista previa
-                    </label>
-                    <div className="h-48 w-48 border border-nut-200 rounded-md overflow-hidden">
-                      <img 
-                        src={editingProduct.image}
-                        alt="Vista previa"
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          // Set a default image on error
-                          (e.target as HTMLImageElement).src = "https://via.placeholder.com/400";
-                        }}
-                      />
-                    </div>
-                  </div>
-                )}
               </div>
               
               <div className="mt-8 flex gap-4">
@@ -265,75 +392,81 @@ const Admin = () => {
               </Button>
             </div>
             
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-nut-50">
-                  <tr>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">ID</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Imagen</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Nombre</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Categoría</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Presentación</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Precio</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Stock</th>
-                    <th className="text-left py-3 px-4 font-medium text-nut-700">Descuento</th>
-                    <th className="text-right py-3 px-4 font-medium text-nut-700">Acciones</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-nut-100">
-                  {productList.map((product) => (
-                    <tr key={product.id} className="hover:bg-nut-50">
-                      <td className="py-3 px-4">{product.id}</td>
-                      <td className="py-3 px-4">
-                        {product.image ? (
-                          <img 
-                            src={product.image}
-                            alt={product.name}
-                            className="w-10 h-10 object-cover rounded"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 bg-nut-100 rounded flex items-center justify-center">
-                            <ImageIcon className="h-5 w-5 text-nut-400" />
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3 px-4">{product.name}</td>
-                      <td className="py-3 px-4">{product.category}</td>
-                      <td className="py-3 px-4">{product.presentation || "-"}</td>
-                      <td className="py-3 px-4">${product.price.toLocaleString()}</td>
-                      <td className="py-3 px-4">
-                        <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
-                          {product.stock}
-                        </span>
-                      </td>
-                      <td className="py-3 px-4">
-                        {product.discount ? `${product.discount}%` : "-"}
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleEdit(product)}
-                            className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(product.id)}
-                            className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </td>
+            {isLoading ? (
+              <div className="p-6 text-center">Cargando productos...</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-nut-50">
+                    <tr>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">ID</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Imagen</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Nombre</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Categoría</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Presentación</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Precio</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Stock</th>
+                      <th className="text-left py-3 px-4 font-medium text-nut-700">Descuento</th>
+                      <th className="text-right py-3 px-4 font-medium text-nut-700">Acciones</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-nut-100">
+                    {productList.map((product) => (
+                      <tr key={product.id} className="hover:bg-nut-50">
+                        <td className="py-3 px-4">{product.id.substring(0, 8)}...</td>
+                        <td className="py-3 px-4">
+                          {product.image ? (
+                            <img 
+                              src={product.image}
+                              alt={product.name}
+                              className="w-10 h-10 object-cover rounded"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 bg-nut-100 rounded flex items-center justify-center">
+                              <ImageIcon className="h-5 w-5 text-nut-400" />
+                            </div>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">{product.name}</td>
+                        <td className="py-3 px-4">
+                          {product.category ? product.category.name : getCategoryName(product.category_id)}
+                        </td>
+                        <td className="py-3 px-4">{product.presentation || "-"}</td>
+                        <td className="py-3 px-4">${product.price.toLocaleString()}</td>
+                        <td className="py-3 px-4">
+                          <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
+                            {product.stock}
+                          </span>
+                        </td>
+                        <td className="py-3 px-4">
+                          {product.discount ? `${product.discount}%` : "-"}
+                        </td>
+                        <td className="py-3 px-4 text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleEdit(product)}
+                              className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleDelete(product.id)}
+                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
       </main>
