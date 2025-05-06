@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -42,7 +41,8 @@ const Admin = () => {
       price: 0,
       image: "https://images.unsplash.com/photo-1567892737950-30c7c8e1c863?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
       category: categories[0],
-      stock: 0
+      stock: 0,
+      presentation: ""
     });
     setIsCreating(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -147,6 +147,18 @@ const Admin = () => {
                     value={editingProduct.price}
                     onChange={(e) => handleChange("price", Number(e.target.value))}
                     placeholder="0"
+                    className="bg-white border-nut-200"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-nut-700 font-medium mb-2">
+                    Presentación*
+                  </label>
+                  <Input 
+                    value={editingProduct.presentation || ""}
+                    onChange={(e) => handleChange("presentation", e.target.value)}
+                    placeholder="100g, 500g, 1kg, etc."
                     className="bg-white border-nut-200"
                   />
                 </div>
@@ -261,6 +273,7 @@ const Admin = () => {
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Imagen</th>
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Nombre</th>
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Categoría</th>
+                    <th className="text-left py-3 px-4 font-medium text-nut-700">Presentación</th>
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Precio</th>
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Stock</th>
                     <th className="text-left py-3 px-4 font-medium text-nut-700">Descuento</th>
@@ -286,6 +299,7 @@ const Admin = () => {
                       </td>
                       <td className="py-3 px-4">{product.name}</td>
                       <td className="py-3 px-4">{product.category}</td>
+                      <td className="py-3 px-4">{product.presentation || "-"}</td>
                       <td className="py-3 px-4">${product.price.toLocaleString()}</td>
                       <td className="py-3 px-4">
                         <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>

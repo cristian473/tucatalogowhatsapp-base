@@ -8,7 +8,8 @@ export const products: Product[] = [
     price: 1200,
     image: "https://images.unsplash.com/photo-1600189083288-747732714019?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Nueces",
-    stock: 52
+    stock: 52,
+    presentation: "500g"
   },
   {
     id: 2,
@@ -17,7 +18,8 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1573851552177-7a81d0a798b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Almendras",
     stock: 38,
-    discount: 10
+    discount: 10,
+    presentation: "1kg"
   },
   {
     id: 3,
@@ -25,7 +27,8 @@ export const products: Product[] = [
     price: 850,
     image: "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Mix",
-    stock: 25
+    stock: 25,
+    presentation: "250g"
   },
   {
     id: 4,
@@ -33,7 +36,8 @@ export const products: Product[] = [
     price: 1500,
     image: "https://images.unsplash.com/photo-1574570757119-d556a6b5745b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80", 
     category: "Pistachos",
-    stock: 18
+    stock: 18,
+    presentation: "400g"
   },
   {
     id: 5,
@@ -41,7 +45,8 @@ export const products: Product[] = [
     price: 1350,
     image: "https://images.unsplash.com/photo-1573759089337-2b89599557c8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Nueces",
-    stock: 0
+    stock: 0,
+    presentation: "300g"
   },
   {
     id: 6,
@@ -50,7 +55,8 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1648733870020-be56391ccda8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Castañas",
     stock: 42,
-    discount: 15
+    discount: 15,
+    presentation: "200g"
   },
   {
     id: 7,
@@ -58,7 +64,8 @@ export const products: Product[] = [
     price: 980,
     image: "https://images.unsplash.com/photo-1567892737950-30c7c8e1c863?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Mix",
-    stock: 30
+    stock: 30,
+    presentation: "100g"
   },
   {
     id: 8,
@@ -67,7 +74,8 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1579035891970-1e2cb82d6a39?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Nueces",
     stock: 15,
-    discount: 5
+    discount: 5,
+    presentation: "150g"
   }
 ];
 

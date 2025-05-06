@@ -12,6 +12,7 @@ export interface Product {
   category: string;
   stock: number;
   discount?: number;
+  presentation?: string; // New property for product presentation (kg, 100g, 500g, etc.)
 }
 
 interface ProductCardProps {
@@ -53,6 +54,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="p-4">
         <div className="text-xs text-nut-500 uppercase mb-1">{product.category}</div>
         <h3 className="font-medium text-nut-800 mb-2 line-clamp-2 h-12">{product.name}</h3>
+        {product.presentation && (
+          <div className="text-xs text-nut-600 mb-2">
+            {product.presentation}
+          </div>
+        )}
         <div className="flex items-baseline mb-3">
           <span className="text-lg font-bold text-nut-800">${finalPrice.toLocaleString()}</span>
           {hasDiscount && (
