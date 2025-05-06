@@ -11,6 +11,7 @@ import { Edit, Trash2, Plus, Image as ImageIcon } from "lucide-react";
 import AdminLogin from "@/components/AdminLogin";
 import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Product {
   id: string;
@@ -31,6 +32,8 @@ interface Category {
   id: string;
   name: string;
 }
+
+const PRESENTATIONS = ["100grs", "250grs", "500grs", "1kg", "3kg", "5kg"];
 
 const Admin = () => {
   const { toast } = useToast();
@@ -136,7 +139,7 @@ const Admin = () => {
       image: "",
       category_id: categories.length > 0 ? categories[0].id : undefined,
       stock: 0,
-      presentation: "",
+      presentation: PRESENTATIONS[0],
       discount: 0,
       description: ""
     });
@@ -177,8 +180,14 @@ const Admin = () => {
           description: "El nuevo producto ha sido creado exitosamente.",
         });
 
-        // Update product list
-        await fetchProducts();
+        // Add the new product to the list
+        if (data && data.length > 0) {
+          const newProduct = {
+            ...data[0],
+            category: categories.find(c => c.id === data[0].category_id)
+          };
+          setProductList([...productList, newProduct]);
+        }
       } else {
         // Update existing product
         const { data, error } = await supabase
@@ -193,7 +202,8 @@ const Admin = () => {
             discount: editingProduct.discount,
             description: editingProduct.description
           })
-          .eq("id", editingProduct.id);
+          .eq("id", editingProduct.id)
+          .select();
 
         if (error) throw error;
 
@@ -202,8 +212,14 @@ const Admin = () => {
           description: "Los cambios han sido guardados exitosamente.",
         });
 
-        // Update product list
-        await fetchProducts();
+        // Update the product in the list
+        if (data && data.length > 0) {
+          const updatedProduct = {
+            ...data[0],
+            category: categories.find(c => c.id === data[0].category_id)
+          };
+          setProductList(productList.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+        }
       }
 
       // Reset form
@@ -292,7 +308,7 @@ const Admin = () => {
                   </label>
                   <Input 
                     type="number"
-                    value={editingProduct.price}
+                    value={editingProduct.price === 0 ? "" : editingProduct.price}
                     onChange={(e) => handleChange("price", Number(e.target.value))}
                     placeholder="0"
                     className="bg-white border-nut-200"
@@ -303,12 +319,21 @@ const Admin = () => {
                   <label className="block text-nut-700 font-medium mb-2">
                     Presentación*
                   </label>
-                  <Input 
-                    value={editingProduct.presentation || ""}
-                    onChange={(e) => handleChange("presentation", e.target.value)}
-                    placeholder="100g, 500g, 1kg, etc."
-                    className="bg-white border-nut-200"
-                  />
+                  <Select 
+                    value={editingProduct.presentation || PRESENTATIONS[0]}
+                    onValueChange={(value) => handleChange("presentation", value)}
+                  >
+                    <SelectTrigger className="bg-white border-nut-200">
+                      <SelectValue placeholder="Seleccione presentación" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PRESENTATIONS.map((presentation) => (
+                        <SelectItem key={presentation} value={presentation}>
+                          {presentation}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 
                 <div>
@@ -317,7 +342,7 @@ const Admin = () => {
                   </label>
                   <Input 
                     type="number"
-                    value={editingProduct.stock}
+                    value={editingProduct.stock === 0 ? "" : editingProduct.stock}
                     onChange={(e) => handleChange("stock", Number(e.target.value))}
                     placeholder="0"
                     className="bg-white border-nut-200"
@@ -330,7 +355,7 @@ const Admin = () => {
                   </label>
                   <Input 
                     type="number"
-                    value={editingProduct.discount || 0}
+                    value={editingProduct.discount === 0 ? "" : editingProduct.discount}
                     onChange={(e) => handleChange("discount", Number(e.target.value))}
                     placeholder="0"
                     className="bg-white border-nut-200"
