@@ -227,30 +227,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-
-        {/* Newsletter */}
-        <section className="py-16 bg-nut-100">
-          <div className="container mx-auto px-4">
-            <div className="max-w-md mx-auto text-center">
-              <h2 className="font-playfair text-2xl font-bold mb-4">
-                Suscríbete a nuestro newsletter
-              </h2>
-              <p className="text-nut-600 mb-6">
-                Recibe ofertas exclusivas, recetas y consejos sobre frutos secos.
-              </p>
-              <div className="flex">
-                <input 
-                  type="email" 
-                  placeholder="Tu email" 
-                  className="flex-grow rounded-l-lg border-nut-200 focus:border-nut-400 focus:ring focus:ring-nut-200 focus:ring-opacity-50"
-                />
-                <Button className="rounded-l-none bg-nut-700 hover:bg-nut-800">
-                  Suscribirse
-                </Button>
-              </div>
-            </div>
-          </div>
-        </section>
       </main>
 
       <Footer />

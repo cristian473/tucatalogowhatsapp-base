@@ -60,9 +60,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         )}
         <div className="flex items-baseline mb-3">
-          <span className="text-lg font-bold text-nut-800">${finalPrice.toLocaleString()}</span>
+          <span className="text-lg font-bold text-nut-800">${finalPrice}</span>
           {hasDiscount && (
-            <span className="ml-2 text-sm text-nut-400 line-through">${product.price.toLocaleString()}</span>
+            <span className="ml-2 text-sm text-nut-400 line-through">${product.price}</span>
           )}
         </div>
         <div className="flex items-center justify-between">
