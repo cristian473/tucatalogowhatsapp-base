@@ -22,9 +22,7 @@ const ProductDetail = () => {
     queryFn: async () => {
       // Ensure we have a valid ID to query with
       if (!id) throw new Error("Invalid product ID");
-      
-      console.log("Fetching product with ID:", id);
-      
+           
       const { data, error } = await supabase
         .from("products")
         .select(`
@@ -161,7 +159,7 @@ const ProductDetail = () => {
     });
   };
 
-  const hasDiscount = product.discount && product.discount > 0;
+  const hasDiscount = product.discount && product.discount > 0? product.discount : '';
   const finalPrice = hasDiscount 
     ? product.price - (product.price * product.discount / 100)
     : product.price;

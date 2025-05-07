@@ -32,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     });
   };
 
-  const hasDiscount = product.discount && product.discount > 0;
+  const hasDiscount = product.discount && product.discount > 0? product.discount : '';
   const finalPrice = hasDiscount 
     ? product.price - (product.price * product.discount / 100)
     : product.price;
