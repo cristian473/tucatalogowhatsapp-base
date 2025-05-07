@@ -1,6 +1,7 @@
 
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
+import { Product } from "@/components/ProductCard"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -24,4 +25,18 @@ export function shuffleArray<T>(array: T[]): T[] {
     [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
   }
   return newArray;
+}
+
+/**
+ * Filter products by search term
+ */
+export function filterProductsBySearch(products: Product[], searchTerm: string): Product[] {
+  if (!searchTerm.trim()) return [];
+  
+  const lowercaseSearch = searchTerm.toLowerCase().trim();
+  
+  return products.filter(product =>
+    product.name.toLowerCase().includes(lowercaseSearch) ||
+    product.category.toLowerCase().includes(lowercaseSearch)
+  ).slice(0, 5); // Limit to 5 results
 }

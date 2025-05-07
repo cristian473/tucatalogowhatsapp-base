@@ -1,20 +1,70 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShoppingCart, Menu, X, Search } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import CartDrawer from "./CartDrawer";
+import { searchProducts } from "@/services/searchService";
+import { Product } from "./ProductCard";
+import ProductSearchResults from "./ProductSearchResults";
+import { useDebounce } from "@/hooks/use-debounce";
 
 const Header = () => {
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<Product[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+
+  useEffect(() => {
+    const performSearch = async () => {
+      if (debouncedSearchTerm.length < 2) {
+        setSearchResults([]);
+        return;
+      }
+      
+      setIsSearching(true);
+      const results = await searchProducts(debouncedSearchTerm);
+      setSearchResults(results);
+      setIsSearching(false);
+      setShowResults(true);
+    };
+
+    performSearch();
+  }, [debouncedSearchTerm]);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleCart = () => setIsCartOpen(!isCartOpen);
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    if (e.target.value.length > 0) {
+      setShowResults(true);
+    }
+  };
+
+  const handleSearchFocus = () => {
+    setShowResults(true);
+  };
+
+  const handleSearchBlur = () => {
+    // Delay hiding results to allow for clicking on them
+    setTimeout(() => {
+      setShowResults(false);
+    }, 200);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm("");
+    setShowResults(false);
+  };
 
   return (
     <header className="border-b border-nut-100 bg-white sticky top-0 z-50">
@@ -47,11 +97,37 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             {/* Search - Desktop */}
             <div className="hidden md:flex items-center relative">
-              <Input 
-                placeholder="Buscar productos..." 
-                className="w-64 bg-nut-50 border-nut-200 focus:border-nut-400" 
-              />
-              <Search className="absolute right-3 h-4 w-4 text-nut-400" />
+              <div className="relative w-64">
+                <Input 
+                  placeholder="Buscar productos..." 
+                  className="w-full bg-nut-50 border-nut-200 focus:border-nut-400 pr-8"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onFocus={handleSearchFocus}
+                  onBlur={handleSearchBlur}
+                />
+                {searchTerm ? (
+                  <button 
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-nut-400 hover:text-nut-600"
+                    onClick={clearSearch}
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                ) : (
+                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-nut-400" />
+                )}
+              </div>
+              
+              {showResults && (
+                <div className="absolute top-full left-0 right-0 mt-1 z-50">
+                  <ProductSearchResults 
+                    results={searchResults} 
+                    isLoading={isSearching} 
+                    onSelect={clearSearch}
+                    searchTerm={searchTerm}
+                  />
+                </div>
+              )}
             </div>
             
             {/* Search - Mobile */}
@@ -67,11 +143,37 @@ const Header = () => {
                 </Button>
                 {searchOpen && (
                   <div className="absolute top-16 left-0 right-0 p-4 bg-white border-b border-nut-100 z-50 animate-fade-in">
-                    <Input 
-                      placeholder="Buscar productos..." 
-                      className="w-full bg-nut-50 border-nut-200" 
-                      autoFocus
-                    />
+                    <div className="relative">
+                      <Input 
+                        placeholder="Buscar productos..." 
+                        className="w-full bg-nut-50 border-nut-200"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        onFocus={handleSearchFocus}
+                        autoFocus
+                      />
+                      {searchTerm ? (
+                        <button 
+                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-nut-400 hover:text-nut-600"
+                          onClick={clearSearch}
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      ) : (
+                        <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-nut-400" />
+                      )}
+                    </div>
+                    
+                    {showResults && (
+                      <div className="mt-2">
+                        <ProductSearchResults 
+                          results={searchResults} 
+                          isLoading={isSearching} 
+                          onSelect={clearSearch}
+                          searchTerm={searchTerm}
+                        />
+                      </div>
+                    )}
                   </div>
                 )}
               </>
