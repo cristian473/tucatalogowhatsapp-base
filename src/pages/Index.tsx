@@ -1,12 +1,39 @@
 
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductList from "@/components/ProductList";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { featuredProducts, newProducts } from "@/data/products";
+import { Product } from "@/components/ProductCard";
+import { getFeaturedProducts, getLatestProducts } from "@/services/productService";
 
 const Index = () => {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [newProducts, setNewProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProducts = async () => {
+      setIsLoading(true);
+      try {
+        const [featured, latest] = await Promise.all([
+          getFeaturedProducts(),
+          getLatestProducts()
+        ]);
+        
+        setFeaturedProducts(featured);
+        setNewProducts(latest);
+      } catch (error) {
+        console.error("Error loading products:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, []);
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -83,14 +110,22 @@ const Index = () => {
         {/* Featured Products */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <ProductList products={featuredProducts} title="Productos destacados" />
-            <div className="text-center mt-10">
-              <Link to="/productos">
-                <Button variant="outline" className="border-nut-700 text-nut-700 hover:bg-nut-50">
-                  Ver todos los productos
-                </Button>
-              </Link>
-            </div>
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nut-700"></div>
+              </div>
+            ) : (
+              <>
+                <ProductList products={featuredProducts} title="Productos destacados" />
+                <div className="text-center mt-10">
+                  <Link to="/productos">
+                    <Button variant="outline" className="border-nut-700 text-nut-700 hover:bg-nut-50">
+                      Ver todos los productos
+                    </Button>
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </section>
 
@@ -125,7 +160,13 @@ const Index = () => {
         {/* New Arrivals */}
         <section className="py-16 bg-nut-50">
           <div className="container mx-auto px-4">
-            <ProductList products={newProducts} title="Recién llegados" />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-nut-700"></div>
+              </div>
+            ) : (
+              <ProductList products={newProducts} title="Recién llegados" />
+            )}
           </div>
         </section>
 
