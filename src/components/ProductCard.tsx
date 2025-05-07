@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -36,8 +37,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? product.price - (product.price * product.discount / 100)
     : product.price;
 
-  // Ensure product.id is properly passed as a string
+  // Ensure product.id is properly passed as a string - use toString to avoid NaN
   const productId = String(product.id);
+
+  // For debugging purposes
+  console.log("Product ID in card:", product.id, "Type:", typeof product.id, "StringID:", productId);
 
   return (
     <Link to={`/producto/${productId}`} className="product-card block bg-white rounded-lg overflow-hidden border border-nut-100 h-full">

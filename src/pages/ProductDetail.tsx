@@ -90,7 +90,7 @@ const ProductDetail = () => {
         if (!error && data) {
           // Format products for our component - make sure we're mapping IDs as strings
           const formatted: Product[] = data.map(item => ({
-            id: String(item.id), // Ensure ID is a string
+            id: item.id, // No need to convert since Supabase already returns id as string
             name: item.name,
             price: item.price,
             image: item.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -148,7 +148,7 @@ const ProductDetail = () => {
   }
 
   const handleQuantityChange = (newQuantity: number) => {
-    if (newQuantity < 1 || (product.stock && newQuantity > product.stock)) {
+    if (newQuantity < 1 || (product?.stock && newQuantity > product.stock)) {
       return;
     }
     setQuantity(newQuantity);
@@ -157,7 +157,7 @@ const ProductDetail = () => {
   const addToCart = () => {
     toast({
       title: "Producto agregado",
-      description: `${quantity} x ${product.name} ha sido agregado al carrito`,
+      description: `${quantity} x ${product?.name} ha sido agregado al carrito`,
     });
   };
 

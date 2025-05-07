@@ -59,7 +59,7 @@ const Products = () => {
         
         // Format products from Supabase
         const formattedProducts: Product[] = productsData.map(product => ({
-          id: Number(product.id),
+          id: product.id, // No need to convert, Supabase returns as string
           name: product.name,
           price: product.price,
           image: product.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
