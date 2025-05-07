@@ -21,6 +21,11 @@ const ProductDetail = () => {
   const { data: product, isLoading, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
+      // Ensure we have a valid ID to query with
+      if (!id) throw new Error("Invalid product ID");
+      
+      console.log("Fetching product with ID:", id);
+      
       const { data, error } = await supabase
         .from("products")
         .select(`
@@ -36,9 +41,16 @@ const ProductDetail = () => {
           categories:category_id (name)
         `)
         .eq("id", id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single to prevent errors when no data is found
       
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching product:", error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error("Product not found");
+      }
       
       // Format product for use with our component
       return {
@@ -118,12 +130,14 @@ const ProductDetail = () => {
   }
 
   if (error || !product) {
+    console.error("Product detail error:", error);
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-grow flex items-center justify-center p-4">
           <div className="text-center">
             <h2 className="font-playfair text-2xl mb-4">Producto no encontrado</h2>
+            <p className="text-nut-500 mb-4">El producto con ID "{id}" no existe o ha sido eliminado.</p>
             <Link to="/productos" className="text-nut-700 hover:underline">
               Volver a productos
             </Link>
