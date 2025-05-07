@@ -1,6 +1,8 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard, { Product } from "@/components/ProductCard";
@@ -8,21 +10,90 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { products } from "@/data/products";
 import { X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 
-const categories = Array.from(new Set(products.map(p => p.category)));
-const maxPrice = Math.max(...products.map(p => p.price));
-
+// We'll fetch categories and products from Supabase instead of using mock data
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
-  const [priceRange, setPriceRange] = useState<number[]>([0, maxPrice]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [maxPrice, setMaxPrice] = useState(2000); // Default max price until we get real data
+  const [priceRange, setPriceRange] = useState<number[]>([0, 2000]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [inStock, setInStock] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [sortOption, setSortOption] = useState("default");
+  const { toast } = useToast();
+  
+  // Fetch products and categories from Supabase
+  useEffect(() => {
+    const fetchProductsAndCategories = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Fetch products
+        const { data: productsData, error: productsError } = await supabase
+          .from("products")
+          .select(`
+            id,
+            name,
+            price,
+            image,
+            stock,
+            discount,
+            presentation,
+            categories:category_id (name)
+          `);
+          
+        if (productsError) {
+          toast({
+            title: "Error",
+            description: "No se pudieron cargar los productos",
+            variant: "destructive",
+          });
+          return;
+        }
+        
+        // Format products from Supabase
+        const formattedProducts: Product[] = productsData.map(product => ({
+          id: Number(product.id),
+          name: product.name,
+          price: product.price,
+          image: product.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+          category: product.categories?.name || "Sin categoría",
+          stock: product.stock,
+          discount: product.discount,
+          presentation: product.presentation
+        }));
+        
+        setAllProducts(formattedProducts);
+        
+        // Extract unique categories
+        const uniqueCategories = Array.from(
+          new Set(formattedProducts.map(p => p.category))
+        );
+        setCategories(uniqueCategories);
+        
+        // Set max price based on the highest product price
+        const highestPrice = Math.max(...formattedProducts.map(p => p.price));
+        setMaxPrice(highestPrice);
+        setPriceRange([0, highestPrice]);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Hubo un problema al cargar los datos",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchProductsAndCategories();
+  }, []);
   
   // Initialize filters from URL params
   useEffect(() => {
@@ -56,7 +127,9 @@ const Products = () => {
   
   // Apply filters
   useEffect(() => {
-    let filtered = [...products];
+    if (allProducts.length === 0) return;
+    
+    let filtered = [...allProducts];
     
     // Search term filter
     if (searchTerm) {
@@ -109,7 +182,7 @@ const Products = () => {
     }
     
     setSearchParams(newParams);
-  }, [searchTerm, selectedCategories, priceRange, inStock, sortOption]);
+  }, [searchTerm, selectedCategories, priceRange, inStock, sortOption, allProducts]);
   
   // Handle sorting
   const sortProducts = (productsToSort: Product[], option: string): Product[] => {
@@ -284,7 +357,12 @@ const Products = () => {
             
             {/* Product Grid */}
             <div className="lg:col-span-3">
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin h-12 w-12 border-4 border-nut-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                  <p className="text-nut-600">Cargando productos...</p>
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-nut-400 mb-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto">
@@ -302,7 +380,7 @@ const Products = () => {
               ) : (
                 <>
                   <div className="mb-4 text-sm text-nut-600">
-                    Mostrando {filteredProducts.length} de {products.length} productos
+                    Mostrando {filteredProducts.length} productos
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredProducts.map((product) => (
