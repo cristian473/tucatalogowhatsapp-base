@@ -78,7 +78,7 @@ const ProductDetail = () => {
           
         if (!error && data) {
           // Format products for our component
-          const formatted = data.map(item => ({
+          const formatted: Product[] = data.map(item => ({
             id: item.id,
             name: item.name,
             price: item.price,

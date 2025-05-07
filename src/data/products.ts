@@ -82,11 +82,20 @@ export const products: Product[] = [
 export const featuredProducts = products.slice(0, 4);
 export const newProducts = [products[5], products[6], products[7], products[1]];
 
-export const getProductById = (id: number): Product | undefined => {
+export const getProductById = (id: number | string): Product | undefined => {
+  if (typeof id === 'string') {
+    // Try to convert string to number for legacy data
+    const numId = parseInt(id);
+    if (!isNaN(numId)) {
+      return products.find(product => product.id === numId);
+    }
+    // If the id is a string that can't be converted to a number, look for a matching string id
+    return products.find(product => product.id === id);
+  }
   return products.find(product => product.id === id);
 };
 
-export const getRelatedProducts = (id: number, category: string): Product[] => {
+export const getRelatedProducts = (id: number | string, category: string): Product[] => {
   return products
     .filter(product => product.id !== id && product.category === category)
     .slice(0, 4);

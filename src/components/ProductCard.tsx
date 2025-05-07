@@ -5,7 +5,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart } from "lucide-react";
 
 export interface Product {
-  id: number;
+  id: string | number; // Updated to accept both string and number types
   name: string;
   price: number;
   image: string;
