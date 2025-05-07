@@ -1,18 +1,17 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart } from "lucide-react";
 
 export interface Product {
-  id: string | number; // Updated to accept both string and number types
+  id: string | number; // Supports both string and number types
   name: string;
   price: number;
   image: string;
   category: string;
   stock: number;
   discount?: number;
-  presentation?: string; // New property for product presentation (kg, 100g, 500g, etc.)
+  presentation?: string;
 }
 
 interface ProductCardProps {
@@ -37,8 +36,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? product.price - (product.price * product.discount / 100)
     : product.price;
 
+  // Ensure product.id is properly passed as a string
+  const productId = String(product.id);
+
   return (
-    <Link to={`/producto/${product.id}`} className="product-card block bg-white rounded-lg overflow-hidden border border-nut-100 h-full">
+    <Link to={`/producto/${productId}`} className="product-card block bg-white rounded-lg overflow-hidden border border-nut-100 h-full">
       <div className="product-image-container aspect-square relative">
         <img 
           src={product.image} 

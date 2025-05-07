@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -89,9 +88,9 @@ const ProductDetail = () => {
           .limit(4);
           
         if (!error && data) {
-          // Format products for our component
+          // Format products for our component - make sure we're mapping IDs as strings
           const formatted: Product[] = data.map(item => ({
-            id: item.id,
+            id: String(item.id), // Ensure ID is a string
             name: item.name,
             price: item.price,
             image: item.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
