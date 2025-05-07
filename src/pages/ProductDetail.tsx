@@ -1,31 +1,123 @@
 
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductList from "@/components/ProductList";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart, Minus, Plus, ChevronLeft } from "lucide-react";
-import { getProductById, getRelatedProducts } from "@/data/products";
+import { Product } from "@/components/ProductCard";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const [quantity, setQuantity] = useState(1);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
-  const product = id ? getProductById(parseInt(id)) : undefined;
+  // Get product data using React Query
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['product', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select(`
+          id,
+          name,
+          price,
+          image,
+          stock,
+          discount,
+          presentation,
+          description,
+          category_id,
+          categories:category_id (name)
+        `)
+        .eq("id", id)
+        .single();
+      
+      if (error) throw error;
+      
+      // Format product for use with our component
+      return {
+        id: data.id,
+        name: data.name,
+        price: data.price,
+        image: data.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+        category: data.categories?.name || "Sin categoría",
+        stock: data.stock,
+        discount: data.discount,
+        presentation: data.presentation,
+        description: data.description,
+        category_id: data.category_id
+      };
+    }
+  });
   
-  const relatedProducts = product 
-    ? getRelatedProducts(product.id, product.category) 
-    : [];
-
+  // Get related products
   useEffect(() => {
-    // Reset quantity when product changes
+    const fetchRelatedProducts = async () => {
+      if (product && product.category_id) {
+        const { data, error } = await supabase
+          .from("products")
+          .select(`
+            id,
+            name,
+            price,
+            image,
+            stock,
+            discount,
+            presentation,
+            categories:category_id (name)
+          `)
+          .eq("category_id", product.category_id)
+          .neq("id", product.id)
+          .limit(4);
+          
+        if (!error && data) {
+          // Format products for our component
+          const formatted = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            category: item.categories?.name || "Sin categoría",
+            stock: item.stock,
+            discount: item.discount,
+            presentation: item.presentation
+          }));
+          
+          setRelatedProducts(formatted);
+        }
+      }
+    };
+    
+    fetchRelatedProducts();
+  }, [product]);
+
+  // Reset quantity when product changes
+  useEffect(() => {
     setQuantity(1);
   }, [id]);
 
-  if (!product) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="animate-spin h-12 w-12 border-4 border-nut-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <h2 className="font-playfair text-2xl mb-4">Cargando producto</h2>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !product) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -74,10 +166,6 @@ const ProductDetail = () => {
               <span className="mx-2">/</span>
               <Link to="/productos" className="hover:text-nut-700">Productos</Link>
               <span className="mx-2">/</span>
-              <Link to={`/productos/${product.category.toLowerCase()}`} className="hover:text-nut-700">
-                {product.category}
-              </Link>
-              <span className="mx-2">/</span>
               <span className="text-nut-800 font-medium truncate">{product.name}</span>
             </div>
           </div>
@@ -116,13 +204,11 @@ const ProductDetail = () => {
 
               <div className="mb-6">
                 <div className="text-nut-600 mb-4">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nisl nec 
-                  ultricies lacinia, nisl nisl aliquet nisl, nec aliquet nisl nisl eget nisl.
-                  Nullam euismod, nisl nec ultricies lacinia, nisl nisl aliquet nisl.
+                  {product.description || "Sin descripción disponible para este producto."}
                 </div>
 
                 <div className={`inline-block px-3 py-1 rounded text-sm font-medium ${product.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {product.stock > 0 ? `${product.stock} unidades disponibles` : 'Agotado'}
+                  {product.stock > 0 ? `${product.stock} unidades disponibles` : 'Últimos'}
                 </div>
               </div>
 
