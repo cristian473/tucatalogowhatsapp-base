@@ -39,7 +39,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <Link to={`/producto/${product.id}`} className="product-card block bg-white rounded-lg overflow-hidden border border-nut-100 h-full">
-      <div className="product-image-container aspect-square">
+      <div className="product-image-container aspect-square relative">
         <img 
           src={product.image} 
           alt={product.name} 
@@ -67,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
         <div className="flex items-center justify-between">
           <div className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-            {product.stock > 0 ? 'En stock' : 'Agotado'}
+            {product.stock > 0 ? 'En stock' : 'Últimos'}
           </div>
           <Button
             size="sm"
