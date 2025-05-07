@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
@@ -21,6 +22,7 @@ const Products = () => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [inStock, setInStock] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
+  const [sortOption, setSortOption] = useState("default");
   
   // Initialize filters from URL params
   useEffect(() => {
@@ -29,6 +31,7 @@ const Products = () => {
     const minPriceParam = searchParams.get('minPrice');
     const maxPriceParam = searchParams.get('maxPrice');
     const stockParam = searchParams.get('inStock');
+    const sortParam = searchParams.get('sort');
     
     if (categoryParam) {
       setSelectedCategories(categoryParam.split(','));
@@ -44,6 +47,10 @@ const Products = () => {
     
     if (stockParam === 'true') {
       setInStock(true);
+    }
+    
+    if (sortParam) {
+      setSortOption(sortParam);
     }
   }, []);
   
@@ -74,6 +81,9 @@ const Products = () => {
       filtered = filtered.filter(p => p.stock > 0);
     }
     
+    // Apply sorting
+    filtered = sortProducts(filtered, sortOption);
+    
     setFilteredProducts(filtered);
     
     // Update URL params
@@ -94,8 +104,36 @@ const Products = () => {
       newParams.set('inStock', 'true');
     }
     
+    if (sortOption !== 'default') {
+      newParams.set('sort', sortOption);
+    }
+    
     setSearchParams(newParams);
-  }, [searchTerm, selectedCategories, priceRange, inStock]);
+  }, [searchTerm, selectedCategories, priceRange, inStock, sortOption]);
+  
+  // Handle sorting
+  const sortProducts = (productsToSort: Product[], option: string): Product[] => {
+    const sorted = [...productsToSort];
+    
+    switch(option) {
+      case 'price-low':
+        return sorted.sort((a, b) => {
+          const aFinalPrice = a.discount ? a.price - (a.price * a.discount / 100) : a.price;
+          const bFinalPrice = b.discount ? b.price - (b.price * b.discount / 100) : b.price;
+          return aFinalPrice - bFinalPrice;
+        });
+      case 'price-high':
+        return sorted.sort((a, b) => {
+          const aFinalPrice = a.discount ? a.price - (a.price * a.discount / 100) : a.price;
+          const bFinalPrice = b.discount ? b.price - (b.price * b.discount / 100) : b.price;
+          return bFinalPrice - aFinalPrice;
+        });
+      case 'name':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      default:
+        return sorted;
+    }
+  };
   
   const toggleCategory = (category: string) => {
     if (selectedCategories.includes(category)) {
@@ -110,6 +148,7 @@ const Products = () => {
     setSelectedCategories([]);
     setPriceRange([0, maxPrice]);
     setInStock(false);
+    setSortOption("default");
     setSearchParams({});
   };
   
@@ -157,6 +196,8 @@ const Products = () => {
             <div className="lg:col-span-1">
               <select 
                 className="w-full h-10 px-3 border border-nut-200 rounded-md focus:outline-none focus:ring-1 focus:ring-nut-300"
+                value={sortOption}
+                onChange={(e) => setSortOption(e.target.value)}
               >
                 <option value="default">Ordenar por</option>
                 <option value="price-low">Precio: Menor a Mayor</option>
