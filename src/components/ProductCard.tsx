@@ -37,7 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? product.price - (product.price * product.discount / 100)
     : product.price;
 
-  // Ensure product.id is properly passed as a string - use toString to avoid NaN
+  // Ensure product.id is properly converted to string
   const productId = String(product.id);
 
   // For debugging purposes

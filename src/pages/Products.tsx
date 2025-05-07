@@ -57,9 +57,9 @@ const Products = () => {
           return;
         }
         
-        // Format products from Supabase
+        // Format products from Supabase - ensure IDs are strings
         const formattedProducts: Product[] = productsData.map(product => ({
-          id: product.id, // No need to convert, Supabase returns as string
+          id: String(product.id), // Ensure ID is explicitly converted to string
           name: product.name,
           price: product.price,
           image: product.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -69,6 +69,7 @@ const Products = () => {
           presentation: product.presentation
         }));
         
+        console.log("Formatted products with IDs:", formattedProducts.map(p => ({id: p.id, type: typeof p.id})));
         setAllProducts(formattedProducts);
         
         // Extract unique categories
