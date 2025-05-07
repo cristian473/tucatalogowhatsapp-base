@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, Trash2, Plus, Image as ImageIcon } from "lucide-react";
+import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star } from "lucide-react";
 import AdminLogin from "@/components/AdminLogin";
 import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import ProductDetailModal from "@/components/ProductDetailModal";
 
 interface Product {
   id: string;
@@ -23,6 +24,8 @@ interface Product {
   presentation?: string;
   discount?: number;
   description?: string;
+  featured?: boolean;
+  created_at?: string;
   category?: {
     name: string;
   };
@@ -43,6 +46,9 @@ const Admin = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [featuredCount, setFeaturedCount] = useState(0);
 
   useEffect(() => {
     // Check if admin is authenticated
@@ -70,6 +76,10 @@ const Admin = () => {
 
       if (error) throw error;
       setProductList(data || []);
+      
+      // Count featured products
+      const featured = data?.filter(p => p.featured) || [];
+      setFeaturedCount(featured.length);
     } catch (error) {
       console.error("Error fetching products:", error);
       toast({
@@ -114,7 +124,13 @@ const Admin = () => {
         if (error) throw error;
 
         // Update the product list
+        const deletedProduct = productList.find(p => p.id === id);
         setProductList(productList.filter(p => p.id !== id));
+        
+        // Update featured count if needed
+        if (deletedProduct?.featured) {
+          setFeaturedCount(prevCount => prevCount - 1);
+        }
         
         toast({
           title: "Producto eliminado",
@@ -141,7 +157,8 @@ const Admin = () => {
       stock: 0,
       presentation: PRESENTATIONS[0],
       discount: 0,
-      description: ""
+      description: "",
+      featured: false
     });
     setIsCreating(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -187,6 +204,11 @@ const Admin = () => {
             category: categories.find(c => c.id === data[0].category_id)
           };
           setProductList([...productList, newProduct]);
+          
+          // Update featured count if needed
+          if (newProduct.featured) {
+            setFeaturedCount(prevCount => prevCount + 1);
+          }
         }
       } else {
         // Update existing product
@@ -200,7 +222,8 @@ const Admin = () => {
             stock: editingProduct.stock,
             presentation: editingProduct.presentation,
             discount: editingProduct.discount,
-            description: editingProduct.description
+            description: editingProduct.description,
+            featured: editingProduct.featured
           })
           .eq("id", editingProduct.id)
           .select();
@@ -218,17 +241,34 @@ const Admin = () => {
             ...data[0],
             category: categories.find(c => c.id === data[0].category_id)
           };
+          
+          // Check if featured status changed
+          const oldProduct = productList.find(p => p.id === updatedProduct.id);
+          if (oldProduct?.featured !== updatedProduct.featured) {
+            if (updatedProduct.featured) {
+              setFeaturedCount(prevCount => prevCount + 1);
+            } else {
+              setFeaturedCount(prevCount => prevCount - 1);
+            }
+          }
+          
           setProductList(productList.map(p => p.id === updatedProduct.id ? updatedProduct : p));
         }
       }
 
       // Reset form
       setEditingProduct(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving product:", error);
+      
+      let errorMessage = "No se pudo guardar el producto";
+      if (error.message && error.message.includes("Maximum of 4 featured products allowed")) {
+        errorMessage = "Solo se permiten un máximo de 4 productos destacados";
+      }
+      
       toast({
         title: "Error",
-        description: "No se pudo guardar el producto",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -242,6 +282,68 @@ const Admin = () => {
     setIsAuthenticated(true);
     fetchProducts();
     fetchCategories();
+  };
+  
+  const handleViewDetail = (product: Product) => {
+    setViewingProduct(product);
+    setIsViewModalOpen(true);
+  };
+  
+  const toggleFeatured = async (product: Product) => {
+    try {
+      const newFeaturedValue = !product.featured;
+      
+      // Check if we're trying to feature a 5th product
+      if (newFeaturedValue && featuredCount >= 4) {
+        toast({
+          title: "Límite alcanzado",
+          description: "Solo se permiten un máximo de 4 productos destacados",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      const { data, error } = await supabase
+        .from("products")
+        .update({
+          featured: newFeaturedValue
+        })
+        .eq("id", product.id)
+        .select();
+
+      if (error) throw error;
+
+      // Update the product in the list and the featured count
+      if (data && data.length > 0) {
+        const updatedProduct = {
+          ...data[0],
+          category: categories.find(c => c.id === data[0].category_id)
+        };
+        
+        setProductList(productList.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+        
+        if (newFeaturedValue) {
+          setFeaturedCount(prevCount => prevCount + 1);
+          toast({
+            title: "Producto destacado",
+            description: `${product.name} ha sido marcado como destacado.`,
+          });
+        } else {
+          setFeaturedCount(prevCount => prevCount - 1);
+          toast({
+            title: "Producto actualizado",
+            description: `${product.name} ya no está destacado.`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating featured status:", error);
+      toast({
+        title: "Error",
+        description: "No se pudo actualizar el estado destacado del producto",
+        variant: "destructive",
+      });
+    }
   };
 
   if (!isAuthenticated) {
@@ -362,6 +464,18 @@ const Admin = () => {
                   />
                 </div>
                 
+                <div className="flex items-center gap-2">
+                  <label className="block text-nut-700 font-medium">
+                    <input 
+                      type="checkbox" 
+                      checked={editingProduct.featured || false} 
+                      onChange={(e) => handleChange("featured", e.target.checked)}
+                      className="mr-2"
+                    />
+                    Destacar producto {featuredCount >= 4 && !editingProduct.featured && "(Máximo alcanzado)"}
+                  </label>
+                </div>
+                
                 <div className="md:col-span-2">
                   <label className="block text-nut-700 font-medium mb-2">
                     Imagen*
@@ -390,6 +504,7 @@ const Admin = () => {
                 <Button 
                   onClick={handleSave}
                   className="bg-nut-700 hover:bg-nut-800"
+                  disabled={editingProduct.featured && featuredCount >= 4 && !productList.find(p => p.id === editingProduct.id)?.featured}
                 >
                   Guardar Cambios
                 </Button>
@@ -424,7 +539,6 @@ const Admin = () => {
                 <table className="w-full">
                   <thead className="bg-nut-50">
                     <tr>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">ID</th>
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Imagen</th>
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Nombre</th>
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Categoría</th>
@@ -432,13 +546,13 @@ const Admin = () => {
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Precio</th>
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Stock</th>
                       <th className="text-left py-3 px-4 font-medium text-nut-700">Descuento</th>
+                      <th className="text-center py-3 px-4 font-medium text-nut-700">Destacado</th>
                       <th className="text-right py-3 px-4 font-medium text-nut-700">Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-nut-100">
                     {productList.map((product) => (
                       <tr key={product.id} className="hover:bg-nut-50">
-                        <td className="py-3 px-4">{product.id.substring(0, 8)}...</td>
                         <td className="py-3 px-4">
                           {product.image ? (
                             <img 
@@ -466,8 +580,26 @@ const Admin = () => {
                         <td className="py-3 px-4">
                           {product.discount ? `${product.discount}%` : "-"}
                         </td>
+                        <td className="py-3 px-4 text-center">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => toggleFeatured(product)}
+                            className={`h-8 w-8 ${product.featured ? 'text-yellow-500' : 'text-nut-300'} hover:text-yellow-600 hover:bg-nut-100`}
+                          >
+                            <Star className="h-4 w-4" fill={product.featured ? "currentColor" : "none"} />
+                          </Button>
+                        </td>
                         <td className="py-3 px-4 text-right">
                           <div className="flex justify-end gap-2">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleViewDetail(product)}
+                              className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
+                            >
+                              <Eye className="h-4 w-4" />
+                            </Button>
                             <Button
                               variant="ghost"
                               size="icon"
@@ -497,6 +629,13 @@ const Admin = () => {
       </main>
       
       <Footer />
+      
+      {/* Product Detail Modal */}
+      <ProductDetailModal 
+        product={viewingProduct}
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+      />
     </div>
   );
 };
