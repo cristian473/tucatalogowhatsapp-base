@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
@@ -18,11 +17,13 @@ const Products = () => {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [presentations, setPresentations] = useState<string[]>([]); // Available presentations
   const [isLoading, setIsLoading] = useState(true);
   const [maxPrice, setMaxPrice] = useState(2000); // Default max price until we get real data
   const [priceRange, setPriceRange] = useState<number[]>([0, 2000]);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedPresentations, setSelectedPresentations] = useState<string[]>([]);
   const [inStock, setInStock] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [sortOption, setSortOption] = useState("default");
@@ -78,6 +79,17 @@ const Products = () => {
         );
         setCategories(uniqueCategories);
         
+        // Extract unique presentations from products with stock
+        const uniquePresentations = Array.from(
+          new Set(
+            formattedProducts
+              .filter(p => p.stock > 0 && p.presentation)
+              .map(p => p.presentation)
+          )
+        ).filter(Boolean) as string[];
+        
+        setPresentations(uniquePresentations);
+        
         // Set max price based on the highest product price
         const highestPrice = Math.max(...formattedProducts.map(p => p.price));
         setMaxPrice(highestPrice);
@@ -99,6 +111,7 @@ const Products = () => {
   // Initialize filters from URL params
   useEffect(() => {
     const categoryParam = searchParams.get('category');
+    const presentationParam = searchParams.get('presentation');
     const searchParam = searchParams.get('search');
     const minPriceParam = searchParams.get('minPrice');
     const maxPriceParam = searchParams.get('maxPrice');
@@ -107,6 +120,10 @@ const Products = () => {
     
     if (categoryParam) {
       setSelectedCategories(categoryParam.split(','));
+    }
+    
+    if (presentationParam) {
+      setSelectedPresentations(presentationParam.split(','));
     }
     
     if (searchParam) {
@@ -145,6 +162,13 @@ const Products = () => {
       filtered = filtered.filter(p => selectedCategories.includes(p.category));
     }
     
+    // Presentation filter
+    if (selectedPresentations.length > 0) {
+      filtered = filtered.filter(p => 
+        p.presentation && selectedPresentations.includes(p.presentation)
+      );
+    }
+    
     // Price range filter
     filtered = filtered.filter(p => 
       p.price >= priceRange[0] && p.price <= priceRange[1]
@@ -167,6 +191,10 @@ const Products = () => {
       newParams.set('category', selectedCategories.join(','));
     }
     
+    if (selectedPresentations.length > 0) {
+      newParams.set('presentation', selectedPresentations.join(','));
+    }
+    
     if (searchTerm) {
       newParams.set('search', searchTerm);
     }
@@ -183,7 +211,7 @@ const Products = () => {
     }
     
     setSearchParams(newParams);
-  }, [searchTerm, selectedCategories, priceRange, inStock, sortOption, allProducts]);
+  }, [searchTerm, selectedCategories, selectedPresentations, priceRange, inStock, sortOption, allProducts]);
   
   // Handle sorting
   const sortProducts = (productsToSort: Product[], option: string): Product[] => {
@@ -217,9 +245,18 @@ const Products = () => {
     }
   };
   
+  const togglePresentation = (presentation: string) => {
+    if (selectedPresentations.includes(presentation)) {
+      setSelectedPresentations(selectedPresentations.filter(p => p !== presentation));
+    } else {
+      setSelectedPresentations([...selectedPresentations, presentation]);
+    }
+  };
+  
   const clearFilters = () => {
     setSearchTerm("");
     setSelectedCategories([]);
+    setSelectedPresentations([]);
     setPriceRange([0, maxPrice]);
     setInStock(false);
     setSortOption("default");
@@ -315,6 +352,28 @@ const Products = () => {
                           className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
                           {category}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Presentations filter - New section */}
+                <div className="mb-4">
+                  <h4 className="font-medium mb-1">Presentación</h4>
+                  <div className="space-y-1">
+                    {presentations.map((presentation) => (
+                      <div key={presentation} className="flex items-center">
+                        <Checkbox
+                          id={`presentation-${presentation}`}
+                          checked={selectedPresentations.includes(presentation)}
+                          onCheckedChange={() => togglePresentation(presentation)}
+                        />
+                        <label
+                          htmlFor={`presentation-${presentation}`}
+                          className="ml-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          {presentation}
                         </label>
                       </div>
                     ))}
