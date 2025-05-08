@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,17 +32,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
       // Update product stock in the database
       for (const item of items) {
-        const { error } = await supabase
-          .from('products')
-          .select('stock')
-          .eq('id', item.id)
-          .single();
-
-        if (error) {
-          console.error("Error checking product stock:", error);
-          throw new Error("Error al verificar el stock del producto");
-        }
-
         const { error: updateError } = await supabase
           .from('products')
           .update({
