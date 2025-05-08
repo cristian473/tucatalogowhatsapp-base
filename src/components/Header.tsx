@@ -232,7 +232,7 @@ const Header = () => {
 
       {/* WhatsApp Button */}
       <WhatsAppButton 
-        phoneNumber="5491159080306" 
+        phoneNumber="1133414526" 
         message="Hola! Me gustaría obtener más información sobre los productos de NuezMarket." 
       />
     </header>
