@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -208,6 +209,13 @@ const ProductDetail = () => {
               <div className="text-sm text-nut-500 uppercase mb-2">{product.category}</div>
               <h1 className="font-playfair text-3xl font-bold mb-4">{product.name}</h1>
               
+              {/* Presentation Display - Added for clearer visibility */}
+              {product.presentation && (
+                <div className="inline-block px-3 py-1.5 bg-nut-50 text-nut-800 rounded-md font-medium mb-4">
+                  Presentación: {product.presentation}
+                </div>
+              )}
+              
               <div className="flex items-baseline mb-6">
                 <span className="text-3xl font-bold text-nut-800">${finalPrice.toLocaleString()}</span>
                 {hasDiscount && (
@@ -296,15 +304,7 @@ const ProductDetail = () => {
                   </svg>
                   Origen seleccionado cuidadosamente
                 </div>
-                <div className="flex items-center text-nut-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-3 text-nut-500">
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                    <path d="M12 20h.01"></path>
-                  </svg>
-                  Envío rápido para preservar frescura
-                </div>
+                {/* "Envío rápido" section removed as requested */}
               </div>
             </div>
           </div>
