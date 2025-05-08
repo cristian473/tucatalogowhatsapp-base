@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,19 +33,27 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
       // Update product stock in the database
       for (const item of items) {
-        const { error: updateError } = await supabase
-          .from('products')
-          .update({
-            stock: supabase.rpc('decrement_stock', { 
-              product_id: item.id, 
-              quantity: item.quantity 
-            })
-          })
-          .eq('id', item.id);
+        // Fix: Call the RPC function correctly to decrement stock
+        const { data, error: updateError } = await supabase
+          .rpc('decrement_stock', { 
+            product_id: item.id, 
+            quantity: item.quantity 
+          });
 
         if (updateError) {
           console.error("Error updating stock:", updateError);
           throw new Error("Error al actualizar el stock");
+        }
+        
+        // Now update the product with the new stock value returned from the RPC
+        const { error: productUpdateError } = await supabase
+          .from('products')
+          .update({ stock: data })
+          .eq('id', item.id);
+          
+        if (productUpdateError) {
+          console.error("Error setting product stock:", productUpdateError);
+          throw new Error("Error al establecer el stock del producto");
         }
       }
 
