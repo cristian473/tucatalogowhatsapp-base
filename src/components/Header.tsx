@@ -10,6 +10,7 @@ import { searchProducts } from "@/services/searchService";
 import { Product } from "./ProductCard";
 import ProductSearchResults from "./ProductSearchResults";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useCart } from "@/contexts/CartContext";
 
 const Header = () => {
   const isMobile = useIsMobile();
@@ -20,6 +21,7 @@ const Header = () => {
   const [searchResults, setSearchResults] = useState<Product[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const { itemCount } = useCart();
   
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
@@ -187,9 +189,11 @@ const Header = () => {
               className="text-nut-700 relative"
             >
               <ShoppingCart className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-nut-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                3
-              </span>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-nut-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
             </Button>
 
             {/* Mobile Menu Button */}

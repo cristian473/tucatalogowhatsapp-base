@@ -1,65 +1,20 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { X, Trash2, Plus, Minus, Send } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
+import { useCart } from "@/contexts/CartContext";
 
 interface CartDrawerProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-// Mock cart data
-const cartItems = [
-  {
-    id: 1,
-    name: "Nueces Peladas Premium",
-    price: 1200,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1600189083288-747732714019?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-  },
-  {
-    id: 2,
-    name: "Almendras Naturales",
-    price: 950,
-    quantity: 1,
-    image: "https://images.unsplash.com/photo-1573851552177-7a81d0a798b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-  },
-  {
-    id: 3,
-    name: "Mix Frutos Secos",
-    price: 850,
-    quantity: 2,
-    image: "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80"
-  }
-];
-
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
-  const [items, setItems] = useState(cartItems);
+  const { items, removeFromCart, updateQuantity, subtotal } = useCart();
   const [customerName, setCustomerName] = useState("");
-
-  const removeItem = (id: number) => {
-    const updatedItems = items.filter(item => item.id !== id);
-    setItems(updatedItems);
-    toast({
-      title: "Producto eliminado",
-      description: "El producto ha sido eliminado del carrito",
-    });
-  };
-
-  const updateQuantity = (id: number, newQuantity: number) => {
-    if (newQuantity < 1) return;
-    
-    const updatedItems = items.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
-    );
-    setItems(updatedItems);
-  };
-
-  const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
   const handleSendWhatsAppOrder = () => {
     if (!customerName.trim()) {
@@ -167,7 +122,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                         variant="ghost"
                         size="icon"
                         className="text-nut-500 hover:text-red-500"
-                        onClick={() => removeItem(item.id)}
+                        onClick={() => removeFromCart(item.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart } from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
 
 export interface Product {
   id: string | number; // Supports both string and number types
@@ -21,10 +22,13 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { toast } = useToast();
+  const { addToCart } = useCart();
 
-  const addToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
+    addToCart(product);
     
     toast({
       title: "Producto agregado",
@@ -32,7 +36,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     });
   };
 
-  const hasDiscount = product.discount && product.discount > 0? product.discount : '';
+  const hasDiscount = product.discount && product.discount > 0 ? product.discount : '';
   const finalPrice = hasDiscount 
     ? product.price - (product.price * product.discount / 100)
     : product.price;
@@ -79,7 +83,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             size="sm"
             className="bg-nut-700 hover:bg-nut-800"
             disabled={product.stock === 0}
-            onClick={addToCart}
+            onClick={handleAddToCart}
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Agregar
