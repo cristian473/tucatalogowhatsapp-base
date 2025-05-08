@@ -39,9 +39,9 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow">
-        {/* Hero Section */}
-        <section className="relative bg-[url('https://images.unsplash.com/photo-1559056199-641db0a2c610?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80')] bg-cover bg-center">
-          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        {/* Hero Section with nuts background */}
+        <section className="relative bg-[url('/lovable-uploads/2e463fb1-c181-4f9f-881a-8ae2fa36bf44.png')] bg-cover bg-center">
+          <div className="absolute inset-0 bg-nut-800/30 backdrop-blur-sm"></div>
           <div className="container mx-auto px-4 py-24 md:py-32 relative z-10 text-center">
             <h1 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-4">
               Los mejores frutos secos
@@ -57,57 +57,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Features */}
-        <section className="py-16 bg-nut-50">
-          <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center p-6 border border-nut-100 rounded-lg bg-white">
-                <div className="w-16 h-16 mx-auto mb-4 bg-nut-100 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-nut-700">
-                    <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
-                    <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
-                    <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
-                    <path d="M12 20h.01"></path>
-                  </svg>
-                </div>
-                <h3 className="font-playfair font-semibold text-xl mb-2">Envíos Rápidos</h3>
-                <p className="text-nut-600">
-                  Recibe tus productos en 24-48hs en CABA y GBA. Envíos a todo el país.
-                </p>
-              </div>
-
-              <div className="text-center p-6 border border-nut-100 rounded-lg bg-white">
-                <div className="w-16 h-16 mx-auto mb-4 bg-nut-100 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-nut-700">
-                    <path d="M20 7h-9"></path>
-                    <path d="M14 17H5"></path>
-                    <circle cx="17" cy="17" r="3"></circle>
-                    <circle cx="7" cy="7" r="3"></circle>
-                  </svg>
-                </div>
-                <h3 className="font-playfair font-semibold text-xl mb-2">Calidad Premium</h3>
-                <p className="text-nut-600">
-                  Frutos seleccionados, almacenados con los mejores estándares de calidad.
-                </p>
-              </div>
-
-              <div className="text-center p-6 border border-nut-100 rounded-lg bg-white">
-                <div className="w-16 h-16 mx-auto mb-4 bg-nut-100 rounded-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-nut-700">
-                    <rect x="3" y="5" width="18" height="14" rx="2"></rect>
-                    <line x1="3" y1="10" x2="21" y2="10"></line>
-                  </svg>
-                </div>
-                <h3 className="font-playfair font-semibold text-xl mb-2">Pago Seguro</h3>
-                <p className="text-nut-600">
-                  Integración con MercadoPago. Paga con tarjeta, transferencia o efectivo.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Featured Products */}
+        {/* Featured Products (skipping the Features section) */}
         <section className="py-16">
           <div className="container mx-auto px-4">
             {isLoading ? (
