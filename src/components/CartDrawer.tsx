@@ -107,10 +107,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     // Find the corresponding product in the cart
     const cartItem = items.find(item => item.id === itemId);
     
-    // Check if we can get the product stock from somewhere
-    // Since we don't have access to the full product data in the cart context,
-    // we can only validate if the quantity is positive for now
-    return currentQuantity < (cartItem?.availableStock || Infinity);
+    // Check if we can increase based on the available stock
+    return currentQuantity < (cartItem?.stock || Infinity);
   };
 
   return (

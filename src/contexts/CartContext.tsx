@@ -10,6 +10,7 @@ export interface CartItem {
   quantity: number;
   discount?: number;
   presentation?: string;
+  stock?: number; // Add stock information from the product
 }
 
 interface CartContextType {
@@ -45,7 +46,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           image: product.image,
           quantity: 1,
           discount: product.discount,
-          presentation: product.presentation
+          presentation: product.presentation,
+          stock: product.stock // Store the product's stock in the cart item
         }];
       }
     });
