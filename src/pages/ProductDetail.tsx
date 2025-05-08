@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -280,12 +279,6 @@ const ProductDetail = () => {
                   <ShoppingCart className="h-5 w-5 mr-2" />
                   Agregar al carrito
                 </Button>
-                <Button 
-                  variant="outline" 
-                  className="border-nut-300 text-nut-700 hover:bg-nut-50 px-8 py-6 text-base"
-                >
-                  Comprar ahora
-                </Button>
               </div>
 
               <div className="space-y-4">
@@ -304,7 +297,6 @@ const ProductDetail = () => {
                   </svg>
                   Origen seleccionado cuidadosamente
                 </div>
-                {/* "Envío rápido" section removed as requested */}
               </div>
             </div>
           </div>
