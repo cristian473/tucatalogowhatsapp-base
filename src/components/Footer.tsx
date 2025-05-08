@@ -53,7 +53,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Categories */}
+          {/* Categories - Reduced to just 4 options */}
           <div>
             <h3 className="text-lg font-bold mb-4">Categorías</h3>
             <ul className="space-y-2">
@@ -75,11 +75,6 @@ const Footer = () => {
               <li>
                 <Link to="/productos?categoria=Pistachos" className="text-nut-200 hover:text-white transition-colors">
                   Pistachos
-                </Link>
-              </li>
-              <li>
-                <Link to="/productos?categoria=Castañas" className="text-nut-200 hover:text-white transition-colors">
-                  Castañas
                 </Link>
               </li>
             </ul>

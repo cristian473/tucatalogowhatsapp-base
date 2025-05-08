@@ -294,15 +294,15 @@ const Products = () => {
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Filters */}
+            {/* Filters - Reduced height */}
             <div className={`lg:block ${showFilters ? 'block' : 'hidden'}`}>
-              <div className="bg-white rounded-lg border border-nut-100 p-6 sticky top-24">
-                <h3 className="font-semibold text-lg mb-4">Filtros</h3>
+              <div className="bg-white rounded-lg border border-nut-100 p-4 sticky top-24">
+                <h3 className="font-semibold text-lg mb-3">Filtros</h3>
                 
-                {/* Categories */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-2">Categorías</h4>
-                  <div className="space-y-2">
+                {/* Categories - Reduced spacing */}
+                <div className="mb-4">
+                  <h4 className="font-medium mb-1">Categorías</h4>
+                  <div className="space-y-1">
                     {categories.map((category) => (
                       <div key={category} className="flex items-center">
                         <Checkbox
@@ -321,9 +321,9 @@ const Products = () => {
                   </div>
                 </div>
                 
-                {/* Price Range */}
-                <div className="mb-6">
-                  <h4 className="font-medium mb-2">Precio</h4>
+                {/* Price Range - Reduced spacing */}
+                <div className="mb-4">
+                  <h4 className="font-medium mb-1">Precio</h4>
                   <Slider 
                     defaultValue={[0, maxPrice]} 
                     max={maxPrice} 
@@ -331,13 +331,13 @@ const Products = () => {
                     value={priceRange}
                     onValueChange={setPriceRange}
                   />
-                  <div className="flex items-center justify-between mt-2">
+                  <div className="flex items-center justify-between mt-1">
                     <span className="text-sm text-nut-600">${priceRange[0]}</span>
                     <span className="text-sm text-nut-600">${priceRange[1]}</span>
                   </div>
                 </div>
                 
-                {/* Stock Filter */}
+                {/* Stock Filter - Reduced spacing */}
                 <div>
                   <div className="flex items-center">
                     <Checkbox
