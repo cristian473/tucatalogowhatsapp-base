@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,11 +69,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       // Create WhatsApp message
       const message = `*Nuevo Pedido*%0A%0A*Nombre*: ${customerName}%0A%0A*Productos*:%0A${orderDetails}%0A%0A*Total a Abonar*: $${subtotal.toLocaleString()}`;
       
-      // WhatsApp phone number
-      const phoneNumber = "5491159080306";
+      // WhatsApp phone number - using the same as the floating button
+      const phoneNumber = "5491133414526"; // Using the same phone number as the floating button (11 3341-4526)
       
-      // Create WhatsApp URL
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      // Create WhatsApp URL with direct sending (no preview)
+      const whatsappUrl = `https://api.whatsapp.com/send?phone=${phoneNumber}&text=${message}`;
       
       // Open WhatsApp in a new tab
       window.open(whatsappUrl, "_blank");

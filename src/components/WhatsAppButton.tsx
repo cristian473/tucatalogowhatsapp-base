@@ -17,11 +17,16 @@ const WhatsAppButton = ({
   // Format the phone number (remove any non-digit characters)
   const formattedPhone = phoneNumber.replace(/\D/g, "");
   
+  // Ensure the number starts with the country code (549 for Argentina WhatsApp)
+  const fullPhoneNumber = formattedPhone.startsWith("549") 
+    ? formattedPhone 
+    : `549${formattedPhone}`;
+  
   // Encode the message for URL
   const encodedMessage = encodeURIComponent(message);
   
-  // Construct WhatsApp URL
-  const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+  // Construct WhatsApp URL - using api.whatsapp.com to enable direct sending
+  const whatsappUrl = `https://api.whatsapp.com/send?phone=${fullPhoneNumber}&text=${encodedMessage}`;
 
   // If hidden, don't render the button
   if (isHidden) {
