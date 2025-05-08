@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Product } from "./ProductCard";
 import ProductSearchResults from "./ProductSearchResults";
 import { useDebounce } from "@/hooks/use-debounce";
 import { useCart } from "@/contexts/CartContext";
+import WhatsAppButton from "./WhatsAppButton";
 
 const Header = () => {
   const isMobile = useIsMobile();
@@ -85,12 +85,6 @@ const Header = () => {
               </Link>
               <Link to="/productos" className="text-nut-700 hover:text-nut-900 transition-colors">
                 Productos
-              </Link>
-              <Link to="/nosotros" className="text-nut-700 hover:text-nut-900 transition-colors">
-                Nosotros
-              </Link>
-              <Link to="/contacto" className="text-nut-700 hover:text-nut-900 transition-colors">
-                Contacto
               </Link>
             </nav>
           )}
@@ -228,20 +222,6 @@ const Header = () => {
               >
                 Productos
               </Link>
-              <Link
-                to="/nosotros"
-                onClick={toggleMenu}
-                className="text-nut-700 hover:text-nut-900 transition-colors py-2"
-              >
-                Nosotros
-              </Link>
-              <Link
-                to="/contacto"
-                onClick={toggleMenu}
-                className="text-nut-700 hover:text-nut-900 transition-colors py-2"
-              >
-                Contacto
-              </Link>
             </div>
           </nav>
         )}
@@ -249,6 +229,12 @@ const Header = () => {
       
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={toggleCart} />
+
+      {/* WhatsApp Button */}
+      <WhatsAppButton 
+        phoneNumber="5491159080306" 
+        message="Hola! Me gustaría obtener más información sobre los productos de NuezMarket." 
+      />
     </header>
   );
 };
