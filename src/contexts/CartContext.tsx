@@ -9,6 +9,7 @@ export interface CartItem {
   image: string;
   quantity: number;
   discount?: number;
+  presentation?: string;
 }
 
 interface CartContextType {
@@ -43,7 +44,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
           price: product.price,
           image: product.image,
           quantity: 1,
-          discount: product.discount
+          discount: product.discount,
+          presentation: product.presentation
         }];
       }
     });

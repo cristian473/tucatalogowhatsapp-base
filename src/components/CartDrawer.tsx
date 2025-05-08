@@ -26,9 +26,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    // Format order details
+    // Format order details with presentation information
     const orderDetails = items.map(item => 
-      `- ${item.quantity}x ${item.name}: $${(item.price * item.quantity).toLocaleString()}`
+      `- ${item.quantity}x ${item.name}${item.presentation ? ` (${item.presentation})` : ''}: $${(item.price * item.quantity).toLocaleString()}`
     ).join("%0A");
 
     // Create WhatsApp message
@@ -97,6 +97,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   />
                   <div className="flex-1">
                     <h4 className="font-medium text-nut-900">{item.name}</h4>
+                    {item.presentation && (
+                      <div className="text-xs text-nut-500 mt-1">
+                        {item.presentation}
+                      </div>
+                    )}
                     <div className="text-nut-700 font-medium mt-1">${item.price.toLocaleString()}</div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center border border-nut-200 rounded-md">
