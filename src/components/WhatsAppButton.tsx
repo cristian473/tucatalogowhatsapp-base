@@ -5,12 +5,14 @@ interface WhatsAppButtonProps {
   phoneNumber: string;
   message: string;
   className?: string;
+  isHidden?: boolean; // New prop to control visibility
 }
 
 const WhatsAppButton = ({
   phoneNumber,
   message,
   className = "",
+  isHidden = false, // Default to visible
 }: WhatsAppButtonProps) => {
   // Format the phone number (remove any non-digit characters)
   const formattedPhone = phoneNumber.replace(/\D/g, "");
@@ -20,6 +22,11 @@ const WhatsAppButton = ({
   
   // Construct WhatsApp URL
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
+
+  // If hidden, don't render the button
+  if (isHidden) {
+    return null;
+  }
 
   return (
     <a

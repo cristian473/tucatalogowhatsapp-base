@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -232,10 +231,11 @@ const Header = () => {
       {/* Cart Drawer */}
       <CartDrawer isOpen={isCartOpen} onClose={toggleCart} />
 
-      {/* WhatsApp Button */}
+      {/* WhatsAppButton with isHidden prop */}
       <WhatsAppButton 
         phoneNumber="11 3341-4526" 
         message="Hola! Me gustaría obtener más información sobre los productos de NuezMarket." 
+        isHidden={isCartOpen} // Hide when cart is open
       />
     </header>
   );
