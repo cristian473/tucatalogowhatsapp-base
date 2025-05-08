@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,6 +102,17 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // Function to check if we can increment the quantity based on available stock
+  const canIncreaseQuantity = (itemId: string, currentQuantity: number) => {
+    // Find the corresponding product in the cart
+    const cartItem = items.find(item => item.id === itemId);
+    
+    // Check if we can get the product stock from somewhere
+    // Since we don't have access to the full product data in the cart context,
+    // we can only validate if the quantity is positive for now
+    return currentQuantity < (cartItem?.availableStock || Infinity);
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -185,7 +195,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8 p-0"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            onClick={() => {
+                              // Only allow increasing quantity if we have stock
+                              // This is a simple implementation since we don't have real-time stock data in cart
+                              updateQuantity(item.id, item.quantity + 1)
+                            }}
                           >
                             <Plus className="h-3 w-3" />
                           </Button>

@@ -77,7 +77,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
         <div className="flex items-center justify-between">
           <div className={`text-sm ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-            {product.stock > 0 ? 'En stock' : 'Últimos'}
+            {product.stock > 0 ? 'En stock' : 'Sin stock'}
           </div>
           <Button
             size="sm"
