@@ -27,9 +27,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
     }
 
     // Format order details with presentation information
-    const orderDetails = items.map(item => 
-      `- ${item.quantity}x ${item.name}${item.presentation ? ` (${item.presentation})` : ''}: $${(item.price * item.quantity).toLocaleString()}`
-    ).join("%0A");
+    const orderDetails = items.map(item => {
+      const itemPrice = item.discount 
+        ? item.price - (item.price * item.discount / 100) 
+        : item.price;
+      
+      return `- ${item.quantity}x ${item.name}${item.presentation ? ` (${item.presentation})` : ''}: $${(itemPrice * item.quantity).toLocaleString()}`;
+    }).join("%0A");
 
     // Create WhatsApp message
     const message = `*Nuevo Pedido*%0A%0A*Nombre*: ${customerName}%0A%0A*Productos*:%0A${orderDetails}%0A%0A*Total a Abonar*: $${subtotal.toLocaleString()}`;
@@ -88,53 +92,69 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             </div>
           ) : (
             <ul className="divide-y divide-nut-100">
-              {items.map(item => (
-                <li key={item.id} className="p-4 flex gap-3">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="w-20 h-20 object-cover rounded-md"
-                  />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-nut-900">{item.name}</h4>
-                    {item.presentation && (
-                      <div className="text-xs text-nut-500 mt-1">
-                        {item.presentation}
+              {items.map(item => {
+                const finalPrice = item.discount 
+                  ? item.price - (item.price * item.discount / 100) 
+                  : item.price;
+                
+                return (
+                  <li key={item.id} className="p-4 flex gap-3">
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      className="w-20 h-20 object-cover rounded-md"
+                    />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-nut-900">{item.name}</h4>
+                      {item.presentation && (
+                        <div className="text-xs text-nut-500 mt-1">
+                          {item.presentation}
+                        </div>
+                      )}
+                      <div className="text-nut-700 font-medium mt-1">
+                        {item.discount ? (
+                          <div className="flex items-center">
+                            <span>${finalPrice.toLocaleString()}</span>
+                            <span className="ml-2 text-xs text-nut-400 line-through">${item.price.toLocaleString()}</span>
+                            <span className="ml-2 text-xs bg-red-100 text-red-700 px-1 rounded">-{item.discount}%</span>
+                          </div>
+                        ) : (
+                          <span>${item.price.toLocaleString()}</span>
+                        )}
                       </div>
-                    )}
-                    <div className="text-nut-700 font-medium mt-1">${item.price.toLocaleString()}</div>
-                    <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center border border-nut-200 rounded-md">
+                      <div className="flex items-center justify-between mt-2">
+                        <div className="flex items-center border border-nut-200 rounded-md">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0"
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center">{item.quantity}</span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0"
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                        </div>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 p-0"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          className="text-nut-500 hover:text-red-500"
+                          onClick={() => removeFromCart(item.id)}
                         >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 p-0"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        >
-                          <Plus className="h-3 w-3" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-nut-500 hover:text-red-500"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
-                  </div>
-                </li>
-              ))}
+                  </li>
+                );
+              })}
             </ul>
           )}
         </div>

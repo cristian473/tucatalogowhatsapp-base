@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -9,10 +10,12 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart, Minus, Plus, ChevronLeft } from "lucide-react";
 import { Product } from "@/components/ProductCard";
+import { useCart } from "@/contexts/CartContext";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
+  const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
@@ -152,7 +155,12 @@ const ProductDetail = () => {
     setQuantity(newQuantity);
   };
 
-  const addToCart = () => {
+  const handleAddToCart = () => {
+    // Add product multiple times based on quantity
+    for (let i = 0; i < quantity; i++) {
+      addToCart(product);
+    }
+    
     toast({
       title: "Producto agregado",
       description: `${quantity} x ${product?.name} ha sido agregado al carrito`,
@@ -258,7 +266,7 @@ const ProductDetail = () => {
 
               <div className="flex flex-wrap gap-4 mb-8">
                 <Button 
-                  onClick={addToCart}
+                  onClick={handleAddToCart}
                   className="bg-nut-700 hover:bg-nut-800 text-white px-8 py-6 text-base"
                   disabled={product.stock === 0}
                 >
