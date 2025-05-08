@@ -41,8 +41,6 @@ const AdminLogin = ({ onLoginSuccess }: AdminLoginProps) => {
       }
 
       if (data && data.password === password) {
-        // Store admin session in localStorage
-        localStorage.setItem("admin_authenticated", "true");
         toast({
           title: "¡Bienvenido!",
           description: "Acceso concedido.",

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -51,16 +50,9 @@ const Admin = () => {
   const [featuredCount, setFeaturedCount] = useState(0);
 
   useEffect(() => {
-    // Check if admin is authenticated
-    const adminAuth = localStorage.getItem("admin_authenticated") === "true";
-    setIsAuthenticated(adminAuth);
-    
-    if (adminAuth) {
-      fetchProducts();
-      fetchCategories();
-    } else {
-      setIsLoading(false);
-    }
+    // Always set authenticated to false initially to force login
+    setIsAuthenticated(false);
+    setIsLoading(false);
   }, []);
 
   const fetchProducts = async () => {
