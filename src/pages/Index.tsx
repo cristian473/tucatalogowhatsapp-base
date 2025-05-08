@@ -109,7 +109,7 @@ const Index = () => {
                     <p className="text-nut-700">No solo contienen muy bajos niveles de azúcar, sino que ayudan a mejorar los niveles de azúcar en sangre de quien las consume con asiduidad</p>
                   </li>
                 </ul>
-                <div className="mt-6">
+                <div className="mt-6 flex justify-center md:justify-start">
                   <Link to="/producto/2384502d-1e5d-489e-938e-5469bc3308c9">
                     <Button className="bg-nut-700 text-white hover:bg-nut-800">
                       Ver productos de nuez pecan

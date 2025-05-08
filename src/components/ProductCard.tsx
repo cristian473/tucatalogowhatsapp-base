@@ -2,8 +2,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Plus } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface Product {
   id: string | number; // Supports both string and number types
@@ -23,6 +24,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { toast } = useToast();
   const { addToCart } = useCart();
+  const isMobile = useIsMobile();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -85,8 +87,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             disabled={product.stock === 0}
             onClick={handleAddToCart}
           >
-            <ShoppingCart className="h-4 w-4 mr-1" />
-            Agregar
+            <ShoppingCart className="h-4 w-4" />
+            {isMobile ? (
+              <Plus className="h-4 w-4" />
+            ) : (
+              <span className="ml-1">Agregar</span>
+            )}
           </Button>
         </div>
       </div>
