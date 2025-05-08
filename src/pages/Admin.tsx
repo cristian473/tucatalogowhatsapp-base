@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star } from "lucide-react";
+import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star, Filter } from "lucide-react";
 import AdminLogin from "@/components/AdminLogin";
 import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
@@ -42,18 +42,43 @@ const Admin = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [productList, setProductList] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [viewingProduct, setViewingProduct] = useState<Product | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [featuredCount, setFeaturedCount] = useState(0);
+  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filterPresentation, setFilterPresentation] = useState<string>("all");
+  const [showFilters, setShowFilters] = useState<boolean>(false);
 
   useEffect(() => {
     // Always set authenticated to false initially to force login
     setIsAuthenticated(false);
     setIsLoading(false);
   }, []);
+
+  // Apply filters whenever productList or filter values change
+  useEffect(() => {
+    applyFilters();
+  }, [productList, filterCategory, filterPresentation]);
+
+  const applyFilters = () => {
+    let filtered = [...productList];
+
+    // Filter by category
+    if (filterCategory !== "all") {
+      filtered = filtered.filter(product => product.category_id === filterCategory);
+    }
+
+    // Filter by presentation
+    if (filterPresentation !== "all") {
+      filtered = filtered.filter(product => product.presentation === filterPresentation);
+    }
+
+    setFilteredProducts(filtered);
+  };
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -338,6 +363,10 @@ const Admin = () => {
     }
   };
 
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -514,7 +543,18 @@ const Admin = () => {
           {/* Product List */}
           <div className="bg-white rounded-lg border border-nut-200">
             <div className="p-6 flex justify-between items-center border-b border-nut-100">
-              <h2 className="text-xl font-bold">Productos</h2>
+              <div className="flex items-center gap-4">
+                <h2 className="text-xl font-bold">Productos</h2>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={toggleFilters}
+                  className="flex items-center gap-1"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filtros
+                </Button>
+              </div>
               <Button 
                 onClick={handleCreateNew}
                 className="bg-nut-700 hover:bg-nut-800"
@@ -523,6 +563,52 @@ const Admin = () => {
                 Nuevo Producto
               </Button>
             </div>
+            
+            {/* Filters */}
+            {showFilters && (
+              <div className="p-4 border-b border-nut-100 bg-nut-50">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-nut-700 mb-1">Filtrar por categoría</label>
+                    <Select 
+                      value={filterCategory}
+                      onValueChange={setFilterCategory}
+                    >
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Todas las categorías" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las categorías</SelectItem>
+                        {categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id}>
+                            {category.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-nut-700 mb-1">Filtrar por presentación</label>
+                    <Select 
+                      value={filterPresentation}
+                      onValueChange={setFilterPresentation}
+                    >
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Todas las presentaciones" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas las presentaciones</SelectItem>
+                        {PRESENTATIONS.map((presentation) => (
+                          <SelectItem key={presentation} value={presentation}>
+                            {presentation}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+            )}
             
             {isLoading ? (
               <div className="p-6 text-center">Cargando productos...</div>
@@ -543,75 +629,83 @@ const Admin = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-nut-100">
-                    {productList.map((product) => (
-                      <tr key={product.id} className="hover:bg-nut-50">
-                        <td className="py-3 px-4">
-                          {product.image ? (
-                            <img 
-                              src={product.image}
-                              alt={product.name}
-                              className="w-10 h-10 object-cover rounded"
-                            />
-                          ) : (
-                            <div className="w-10 h-10 bg-nut-100 rounded flex items-center justify-center">
-                              <ImageIcon className="h-5 w-5 text-nut-400" />
+                    {filteredProducts.length > 0 ? (
+                      filteredProducts.map((product) => (
+                        <tr key={product.id} className="hover:bg-nut-50">
+                          <td className="py-3 px-4">
+                            {product.image ? (
+                              <img 
+                                src={product.image}
+                                alt={product.name}
+                                className="w-10 h-10 object-cover rounded"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 bg-nut-100 rounded flex items-center justify-center">
+                                <ImageIcon className="h-5 w-5 text-nut-400" />
+                              </div>
+                            )}
+                          </td>
+                          <td className="py-3 px-4">{product.name}</td>
+                          <td className="py-3 px-4">
+                            {product.category ? product.category.name : getCategoryName(product.category_id)}
+                          </td>
+                          <td className="py-3 px-4">{product.presentation || "-"}</td>
+                          <td className="py-3 px-4">${product.price.toLocaleString()}</td>
+                          <td className="py-3 px-4">
+                            <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
+                              {product.stock}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {product.discount ? `${product.discount}%` : "-"}
+                          </td>
+                          <td className="py-3 px-4 text-center">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => toggleFeatured(product)}
+                              className={`h-8 w-8 ${product.featured ? 'text-yellow-500' : 'text-nut-300'} hover:text-yellow-600 hover:bg-nut-100`}
+                            >
+                              <Star className="h-4 w-4" fill={product.featured ? "currentColor" : "none"} />
+                            </Button>
+                          </td>
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex justify-end gap-2">
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleViewDetail(product)}
+                                className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
+                              >
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleEdit(product)}
+                                className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => handleDelete(product.id)}
+                                className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
                             </div>
-                          )}
-                        </td>
-                        <td className="py-3 px-4">{product.name}</td>
-                        <td className="py-3 px-4">
-                          {product.category ? product.category.name : getCategoryName(product.category_id)}
-                        </td>
-                        <td className="py-3 px-4">{product.presentation || "-"}</td>
-                        <td className="py-3 px-4">${product.price.toLocaleString()}</td>
-                        <td className="py-3 px-4">
-                          <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
-                            {product.stock}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4">
-                          {product.discount ? `${product.discount}%` : "-"}
-                        </td>
-                        <td className="py-3 px-4 text-center">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => toggleFeatured(product)}
-                            className={`h-8 w-8 ${product.featured ? 'text-yellow-500' : 'text-nut-300'} hover:text-yellow-600 hover:bg-nut-100`}
-                          >
-                            <Star className="h-4 w-4" fill={product.featured ? "currentColor" : "none"} />
-                          </Button>
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleViewDetail(product)}
-                              className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleEdit(product)}
-                              className="h-8 w-8 text-nut-600 hover:text-nut-800 hover:bg-nut-100"
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleDelete(product.id)}
-                              className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={9} className="text-center py-6 text-nut-600">
+                          No se encontraron productos con los filtros aplicados
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
