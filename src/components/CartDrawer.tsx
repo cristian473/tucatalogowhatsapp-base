@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { X, Trash2, Plus, Minus, Send } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -13,10 +14,11 @@ interface CartDrawerProps {
 
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
-  const { items, removeFromCart, updateQuantity, subtotal } = useCart();
+  const { items, removeFromCart, updateQuantity, subtotal, clearCart } = useCart();
   const [customerName, setCustomerName] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleSendWhatsAppOrder = () => {
+  const handleSendWhatsAppOrder = async () => {
     if (!customerName.trim()) {
       toast({
         title: "Nombre requerido",
@@ -26,31 +28,80 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
       return;
     }
 
-    // Format order details with presentation information
-    const orderDetails = items.map(item => {
-      const itemPrice = item.discount 
-        ? item.price - (item.price * item.discount / 100) 
-        : item.price;
-      
-      return `- ${item.quantity}x ${item.name}${item.presentation ? ` (${item.presentation})` : ''}: $${(itemPrice * item.quantity).toLocaleString()}`;
-    }).join("%0A");
+    try {
+      setIsProcessing(true);
 
-    // Create WhatsApp message
-    const message = `*Nuevo Pedido*%0A%0A*Nombre*: ${customerName}%0A%0A*Productos*:%0A${orderDetails}%0A%0A*Total a Abonar*: $${subtotal.toLocaleString()}`;
-    
-    // WhatsApp phone number
-    const phoneNumber = "5491159080306";
-    
-    // Create WhatsApp URL
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
-    
-    // Open WhatsApp in a new tab
-    window.open(whatsappUrl, "_blank");
-    
-    toast({
-      title: "¡Pedido enviado!",
-      description: "Tu pedido ha sido enviado por WhatsApp",
-    });
+      // Update product stock in the database
+      for (const item of items) {
+        const { error } = await supabase
+          .from('products')
+          .select('stock')
+          .eq('id', item.id)
+          .single();
+
+        if (error) {
+          console.error("Error checking product stock:", error);
+          throw new Error("Error al verificar el stock del producto");
+        }
+
+        const { error: updateError } = await supabase
+          .from('products')
+          .update({
+            stock: supabase.rpc('decrement_stock', { 
+              product_id: item.id, 
+              quantity: item.quantity 
+            })
+          })
+          .eq('id', item.id);
+
+        if (updateError) {
+          console.error("Error updating stock:", updateError);
+          throw new Error("Error al actualizar el stock");
+        }
+      }
+
+      // Format order details with presentation information
+      const orderDetails = items.map(item => {
+        const itemPrice = item.discount 
+          ? item.price - (item.price * item.discount / 100) 
+          : item.price;
+        
+        return `- ${item.quantity}x ${item.name}${item.presentation ? ` (${item.presentation})` : ''}: $${(itemPrice * item.quantity).toLocaleString()}`;
+      }).join("%0A");
+
+      // Create WhatsApp message
+      const message = `*Nuevo Pedido*%0A%0A*Nombre*: ${customerName}%0A%0A*Productos*:%0A${orderDetails}%0A%0A*Total a Abonar*: $${subtotal.toLocaleString()}`;
+      
+      // WhatsApp phone number
+      const phoneNumber = "5491159080306";
+      
+      // Create WhatsApp URL
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+      
+      // Open WhatsApp in a new tab
+      window.open(whatsappUrl, "_blank");
+      
+      toast({
+        title: "¡Pedido enviado!",
+        description: "Tu pedido ha sido enviado por WhatsApp y el stock se ha actualizado",
+      });
+
+      // Clear cart and reset customer name
+      clearCart();
+      setCustomerName("");
+      
+      // Close the cart drawer
+      onClose();
+    } catch (error) {
+      console.error("Error processing order:", error);
+      toast({
+        title: "Error al procesar el pedido",
+        description: "Ocurrió un error al procesar tu pedido. Por favor, intenta nuevamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -184,9 +235,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
             <Button 
               className="w-full bg-nut-700 hover:bg-nut-800" 
               onClick={handleSendWhatsAppOrder}
+              disabled={isProcessing}
             >
               <Send className="h-4 w-4 mr-2" />
-              Realizar Pedido
+              {isProcessing ? "Procesando..." : "Realizar Pedido"}
             </Button>
           </div>
         )}
