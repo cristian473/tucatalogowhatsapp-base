@@ -110,7 +110,7 @@ const Index = () => {
                   </li>
                 </ul>
                 <div className="mt-6">
-                  <Link to="/productos/nuez-pecan">
+                  <Link to="/producto/2384502d-1e5d-489e-938e-5469bc3308c9">
                     <Button className="bg-nut-700 text-white hover:bg-nut-800">
                       Ver productos de nuez pecan
                     </Button>
