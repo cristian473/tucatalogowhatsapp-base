@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { X, Trash2, Plus, Minus } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { X, Trash2, Plus, Minus, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -38,6 +39,7 @@ const cartItems = [
 const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   const { toast } = useToast();
   const [items, setItems] = useState(cartItems);
+  const [customerName, setCustomerName] = useState("");
 
   const removeItem = (id: number) => {
     const updatedItems = items.filter(item => item.id !== id);
@@ -58,6 +60,39 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
   };
 
   const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  const handleSendWhatsAppOrder = () => {
+    if (!customerName.trim()) {
+      toast({
+        title: "Nombre requerido",
+        description: "Por favor, ingresa tu nombre para continuar",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Format order details
+    const orderDetails = items.map(item => 
+      `- ${item.quantity}x ${item.name}: $${(item.price * item.quantity).toLocaleString()}`
+    ).join("%0A");
+
+    // Create WhatsApp message
+    const message = `*Nuevo Pedido*%0A%0A*Nombre*: ${customerName}%0A%0A*Productos*:%0A${orderDetails}%0A%0A*Total a Abonar*: $${subtotal.toLocaleString()}`;
+    
+    // WhatsApp phone number
+    const phoneNumber = "5491159080306";
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`;
+    
+    // Open WhatsApp in a new tab
+    window.open(whatsappUrl, "_blank");
+    
+    toast({
+      title: "¡Pedido enviado!",
+      description: "Tu pedido ha sido enviado por WhatsApp",
+    });
+  };
 
   if (!isOpen) return null;
 
@@ -80,7 +115,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Cart Items */}
-        <div className="overflow-y-auto h-[calc(100vh-200px)]">
+        <div className="overflow-y-auto h-[calc(100vh-280px)]">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full p-6">
               <div className="text-nut-400 mb-4">
@@ -147,19 +182,32 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
         {/* Footer */}
         {items.length > 0 && (
           <div className="border-t border-nut-100 p-4 bg-white absolute bottom-0 left-0 right-0">
+            {/* Customer Name Input */}
+            <div className="mb-4">
+              <label htmlFor="customerName" className="block text-nut-600 mb-1 text-sm">
+                Nombre del comprador
+              </label>
+              <Input
+                id="customerName"
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                placeholder="Ingresa tu nombre"
+                className="bg-white border-nut-200"
+              />
+            </div>
+
             <div className="flex justify-between mb-4">
               <span className="text-nut-600">Subtotal</span>
               <span className="font-semibold">${subtotal.toLocaleString()}</span>
             </div>
-            <div className="flex justify-between mb-6">
-              <span className="text-nut-600">Envío</span>
-              <span className="font-semibold">Calculado al finalizar</span>
-            </div>
-            <Link to="/checkout">
-              <Button className="w-full bg-nut-700 hover:bg-nut-800" onClick={onClose}>
-                Finalizar Compra
-              </Button>
-            </Link>
+
+            <Button 
+              className="w-full bg-nut-700 hover:bg-nut-800" 
+              onClick={handleSendWhatsAppOrder}
+            >
+              <Send className="h-4 w-4 mr-2" />
+              Realizar Pedido
+            </Button>
           </div>
         )}
       </div>
