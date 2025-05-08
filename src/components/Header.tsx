@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -72,14 +73,15 @@ const Header = () => {
     <header className="border-b border-nut-100 bg-white sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <h1 className="text-2xl font-playfair font-bold text-nut-800">NuezMarket</h1>
-          </Link>
+          {/* Logo and Navigation grouped together */}
+          <div className="flex items-center space-x-8">
+            {/* Logo */}
+            <Link to="/" className="flex items-center">
+              <h1 className="text-2xl font-playfair font-bold text-nut-800">NuezMarket</h1>
+            </Link>
 
-          {/* Desktop Navigation */}
-          {!isMobile && (
-            <nav className="hidden md:flex items-center space-x-8">
+            {/* Desktop Navigation moved next to logo */}
+            <nav className={`${isMobile ? 'hidden' : 'flex'} items-center space-x-8`}>
               <Link to="/" className="text-nut-700 hover:text-nut-900 transition-colors">
                 Inicio
               </Link>
@@ -87,7 +89,7 @@ const Header = () => {
                 Productos
               </Link>
             </nav>
-          )}
+          </div>
 
           {/* Actions */}
           <div className="flex items-center space-x-4">
@@ -232,7 +234,7 @@ const Header = () => {
 
       {/* WhatsApp Button */}
       <WhatsAppButton 
-        phoneNumber="1133414526" 
+        phoneNumber="11 3341-4526" 
         message="Hola! Me gustaría obtener más información sobre los productos de NuezMarket." 
       />
     </header>
