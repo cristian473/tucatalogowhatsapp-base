@@ -12,6 +12,7 @@ import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ProductDetailModal from "@/components/ProductDetailModal";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Product {
   id: string;
@@ -52,6 +53,7 @@ const Admin = () => {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterPresentation, setFilterPresentation] = useState<string>("all");
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     // Always set authenticated to false initially to force login
@@ -552,15 +554,15 @@ const Admin = () => {
                   className="flex items-center gap-1"
                 >
                   <Filter className="h-4 w-4" />
-                  Filtros
+                  {!isMobile && "Filtros"}
                 </Button>
               </div>
               <Button 
                 onClick={handleCreateNew}
                 className="bg-nut-700 hover:bg-nut-800"
               >
-                <Plus className="h-4 w-4 mr-2" />
-                Nuevo Producto
+                <Plus className="h-4 w-4" />
+                {!isMobile && <span className="ml-2">Nuevo Producto</span>}
               </Button>
             </div>
             
