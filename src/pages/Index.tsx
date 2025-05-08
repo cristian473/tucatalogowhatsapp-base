@@ -79,28 +79,49 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Banner */}
-        <section className="py-16 bg-nut-800 text-white">
+        {/* Pecan Benefits Section */}
+        <section className="py-16 bg-nut-50">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
-                <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-4">
-                  Prueba nuestro nuevo mix de frutos energéticos
+                <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-6 text-nut-800">
+                  Los beneficios de las nueces pecan
                 </h2>
-                <p className="text-nut-200 mb-6">
-                  Una combinación perfecta de nueces, almendras, castañas y pasas para darte la energía que necesitas durante todo el día.
-                </p>
-                <Link to="/productos/mix">
-                  <Button className="bg-white text-nut-800 hover:bg-nut-100">
-                    Conocer más
-                  </Button>
-                </Link>
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Efectos Antioxidantes ya que proveen al organismo de fitonutrientes</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Son ricas en ácidos grasos monoinsaturados que ayudan a reducir el colesterol y reducir todo tipo de enfermedad coronaria</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Ayudan a controlar el peso por su capacidad saciante</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Es un alimento libre de sodio, lo que permite su inclusión en dietas bajas en sodio para aportar nutrientes necesarios al organismo</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">No solo contienen muy bajos niveles de azúcar, sino que ayudan a mejorar los niveles de azúcar en sangre de quien las consume con asiduidad</p>
+                  </li>
+                </ul>
+                <div className="mt-6">
+                  <Link to="/productos/nuez-pecan">
+                    <Button className="bg-nut-700 text-white hover:bg-nut-800">
+                      Ver productos de nuez pecan
+                    </Button>
+                  </Link>
+                </div>
               </div>
               <div className="md:w-1/2">
                 <img 
-                  src="https://images.unsplash.com/photo-1567892737950-30c7c8e1c863?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-                  alt="Mix Energético" 
-                  className="rounded-lg shadow-lg"
+                  src="/lovable-uploads/51e682ab-e61c-4f74-82c2-b6191ebd971c.png" 
+                  alt="Nueces Pecan" 
+                  className="rounded-lg shadow-lg w-full h-auto object-cover"
                 />
               </div>
             </div>
@@ -108,7 +129,7 @@ const Index = () => {
         </section>
 
         {/* New Arrivals */}
-        <section className="py-16 bg-nut-50">
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
@@ -121,7 +142,7 @@ const Index = () => {
         </section>
 
         {/* Testimonials */}
-        <section className="py-16">
+        <section className="py-16 bg-nut-50">
           <div className="container mx-auto px-4">
             <h2 className="font-playfair text-3xl md:text-4xl font-bold mb-12 text-center">
               Lo que dicen nuestros clientes
