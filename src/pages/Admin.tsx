@@ -36,7 +36,7 @@ interface Category {
   name: string;
 }
 
-const PRESENTATIONS = ["100grs", "250grs", "500grs", "1kg", "3kg", "5kg"];
+const PRESENTATIONS = ["100grs", "200grs", "500grs", "1kg"];
 
 const Admin = () => {
   const { toast } = useToast();
