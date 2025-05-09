@@ -28,7 +28,7 @@ export const products: Product[] = [
     image: "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Mix",
     stock: 25,
-    presentation: "250g"
+    presentation: "200g"
   },
   {
     id: "4",
