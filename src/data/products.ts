@@ -4,7 +4,7 @@ import { Product } from "@/components/ProductCard";
 export const products: Product[] = [
   {
     id: "1",
-    name: "Nueces Peladas Premium",
+    name: "Nueces Peladas",
     price: 1200,
     image: "https://images.unsplash.com/photo-1600189083288-747732714019?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     category: "Nueces",
