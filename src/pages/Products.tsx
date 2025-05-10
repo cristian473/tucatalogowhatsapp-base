@@ -70,7 +70,6 @@ const Products = () => {
           presentation: product.presentation
         }));
         
-        console.log("Formatted products with IDs:", formattedProducts.map(p => ({id: p.id, type: typeof p.id})));
         setAllProducts(formattedProducts);
         
         // Extract unique categories

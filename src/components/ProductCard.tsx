@@ -46,9 +46,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   // Ensure product.id is properly converted to string
   const productId = String(product.id);
 
-  // For debugging purposes
-  console.log("Product ID in card:", product.id, "Type:", typeof product.id, "StringID:", productId);
-
   return (
     <Link to={`/producto/${productId}`} className="product-card block bg-white rounded-lg overflow-hidden border border-nut-100 h-full">
       <div className="product-image-container aspect-square relative">
