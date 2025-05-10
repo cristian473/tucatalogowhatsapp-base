@@ -20,7 +20,8 @@ const ProductSearchResults: React.FC<ProductSearchResultsProps> = ({
   const navigate = useNavigate();
 
   const handleSelect = (product: Product) => {
-    // Ensure we're navigating with the full product ID
+    console.log("Navigating to product with ID:", product.id, "Type:", typeof product.id);
+    // Ensure we're navigating with the string ID
     navigate(`/producto/${product.id}`);
     onSelect();
   };

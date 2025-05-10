@@ -25,8 +25,9 @@ export async function searchProducts(searchTerm: string): Promise<Product[]> {
     return [];
   }
 
+  // Ensure we return IDs as strings for consistency
   return data.map(product => ({
-    id: product.id, // Keep ID as string as returned by Supabase
+    id: String(product.id), // Explicitly convert ID to string
     name: product.name,
     price: product.price,
     image: product.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
