@@ -76,7 +76,7 @@ const Header = () => {
           <div className="flex items-center space-x-8">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <h1 className="text-2xl font-playfair font-bold text-nut-800">NuezMarket</h1>
+              <h1 className="text-2xl font-playfair font-bold text-nut-800">Maná frutos-secos</h1>
             </Link>
 
             {/* Desktop Navigation moved next to logo */}
@@ -234,7 +234,7 @@ const Header = () => {
       {/* WhatsAppButton with isHidden prop */}
       <WhatsAppButton 
         phoneNumber="11 3341-4526" 
-        message="Hola! Me gustaría obtener más información sobre los productos de NuezMarket." 
+        message="Hola! Me gustaría obtener más información sobre los productos de Maná frutos-secos." 
         isHidden={isCartOpen} // Hide when cart is open
       />
     </header>

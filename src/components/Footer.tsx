@@ -32,7 +32,7 @@ const Footer = () => {
             {/* Brand and description - shorter for mobile */}
             <div>
               <Link to="/" className="inline-block mb-2">
-                <h2 className="text-xl font-playfair font-bold text-white">NuezMarket</h2>
+                <h2 className="text-xl font-playfair font-bold text-white">Maná frutos-secos</h2>
               </Link>
               <p className="text-nut-200 text-sm mb-0">
                 Los mejores frutos secos de la región, seleccionados para brindarte la mejor calidad.
@@ -86,7 +86,7 @@ const Footer = () => {
                 <span className="text-nut-200 text-sm">+54 11 3341-4526</span>
               </div>
               <p className="text-nut-300 text-xs text-center">
-                &copy; {currentYear} NuezMarket.
+                &copy; {currentYear} Maná frutos-secos.
               </p>
             </div>
           </div>
@@ -97,7 +97,7 @@ const Footer = () => {
               {/* Brand */}
               <div>
                 <Link to="/" className="inline-block mb-4">
-                  <h2 className="text-xl font-playfair font-bold text-white">NuezMarket</h2>
+                  <h2 className="text-xl font-playfair font-bold text-white">Maná frutos-secos</h2>
                 </Link>
                 <p className="text-nut-200 mb-4">
                   Los mejores frutos secos de la región, seleccionados cuidadosamente para brindarte la mejor calidad y sabor.
@@ -168,7 +168,7 @@ const Footer = () => {
             <div className="mt-12 pt-6 border-t border-nut-800">
               <div className="flex flex-col md:flex-row justify-between items-center">
                 <p className="text-nut-300 text-sm">
-                  &copy; {currentYear} NuezMarket. Todos los derechos reservados.
+                  &copy; {currentYear} Maná frutos-secos. Todos los derechos reservados.
                 </p>
               </div>
             </div>
