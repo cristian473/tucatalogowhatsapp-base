@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { X, SlidersHorizontal, ChevronDown, ChevronUp } from "lucide-react";
 
-// We'll fetch categories and products from Supabase instead of using mock data
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
