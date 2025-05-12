@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -76,7 +77,11 @@ const Header = () => {
           <div className="flex items-center space-x-8">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <h1 className="text-2xl font-playfair font-bold text-nut-800">Maná frutos-secos</h1>
+              <img 
+                src="/lovable-uploads/a6169c5e-68c8-4fec-ab92-b1b5dc24489b.png" 
+                alt="Maná frutos-secos Logo" 
+                className="h-14 w-auto" 
+              />
             </Link>
 
             {/* Desktop Navigation moved next to logo */}
