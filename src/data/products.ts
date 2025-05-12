@@ -25,7 +25,7 @@ export const products: Product[] = [
     id: "3",
     name: "Mix Frutos Secos Gourmet",
     price: 850,
-    image: "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+    image: "/lovable-uploads/e9db9ec2-511e-47aa-a6ea-706acbc8e087.png",
     category: "Mix",
     stock: 25,
     presentation: "200g"
