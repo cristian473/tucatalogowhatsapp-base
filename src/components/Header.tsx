@@ -71,7 +71,7 @@ const Header = () => {
 
   return (
     <header className="border-b border-nut-100 bg-white sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-4">
         <div className="flex items-center justify-between">
           {/* Logo and Navigation grouped together */}
           <div className="flex items-center space-x-8">
