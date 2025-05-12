@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -6,13 +7,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star, Filter } from "lucide-react";
+import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star, Filter, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import AdminLogin from "@/components/AdminLogin";
 import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import { useIsMobile } from "@/hooks/use-mobile";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface Product {
   id: string;
@@ -36,6 +45,9 @@ interface Category {
   name: string;
 }
 
+type SortKey = 'name' | 'category' | 'presentation' | 'price' | 'stock' | 'discount' | 'featured';
+type SortDirection = 'asc' | 'desc' | null;
+
 const PRESENTATIONS = ["100grs", "200grs", "500grs", "1kg"];
 
 const Admin = () => {
@@ -53,6 +65,8 @@ const Admin = () => {
   const [filterCategory, setFilterCategory] = useState<string>("all");
   const [filterPresentation, setFilterPresentation] = useState<string>("all");
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -61,12 +75,8 @@ const Admin = () => {
     setIsLoading(false);
   }, []);
 
-  // Apply filters whenever productList or filter values change
+  // Apply filters and sorting whenever productList or filter/sort values change
   useEffect(() => {
-    applyFilters();
-  }, [productList, filterCategory, filterPresentation]);
-
-  const applyFilters = () => {
     let filtered = [...productList];
 
     // Filter by category
@@ -79,8 +89,100 @@ const Admin = () => {
       filtered = filtered.filter(product => product.presentation === filterPresentation);
     }
 
+    // Apply sorting if a sort key is selected
+    if (sortKey && sortDirection) {
+      filtered = sortProducts(filtered, sortKey, sortDirection);
+    }
+
     setFilteredProducts(filtered);
+  }, [productList, filterCategory, filterPresentation, sortKey, sortDirection]);
+
+  // Function to sort products based on key and direction
+  const sortProducts = (products: Product[], key: SortKey, direction: SortDirection) => {
+    return [...products].sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+
+      // Handle different column types
+      switch (key) {
+        case 'name':
+          valueA = a.name?.toLowerCase() || '';
+          valueB = b.name?.toLowerCase() || '';
+          break;
+        case 'category':
+          valueA = a.category?.name?.toLowerCase() || '';
+          valueB = b.category?.name?.toLowerCase() || '';
+          break;
+        case 'presentation':
+          valueA = a.presentation || '';
+          valueB = b.presentation || '';
+          break;
+        case 'price':
+          valueA = a.price || 0;
+          valueB = b.price || 0;
+          break;
+        case 'stock':
+          valueA = a.stock || 0;
+          valueB = b.stock || 0;
+          break;
+        case 'discount':
+          valueA = a.discount || 0;
+          valueB = b.discount || 0;
+          break;
+        case 'featured':
+          valueA = a.featured ? 1 : 0;
+          valueB = b.featured ? 1 : 0;
+          break;
+        default:
+          valueA = a.name?.toLowerCase() || '';
+          valueB = b.name?.toLowerCase() || '';
+      }
+
+      if (direction === 'asc') {
+        return valueA > valueB ? 1 : -1;
+      } else {
+        return valueA < valueB ? 1 : -1;
+      }
+    });
   };
+
+  // Function to toggle sort when a column header is clicked
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      // Cycle through: asc -> desc -> none
+      if (sortDirection === 'asc') {
+        setSortDirection('desc');
+      } else if (sortDirection === 'desc') {
+        setSortKey(null);
+        setSortDirection(null);
+      }
+    } else {
+      setSortKey(key);
+      setSortDirection('asc');
+    }
+  };
+
+  // Get the appropriate sort icon based on column and current sort state
+  const getSortIcon = (key: SortKey) => {
+    if (sortKey !== key) {
+      return <ArrowUpDown className="h-4 w-4 ml-2 inline-block opacity-50" />;
+    } else if (sortDirection === 'asc') {
+      return <ArrowUp className="h-4 w-4 ml-2 inline-block" />;
+    } else {
+      return <ArrowDown className="h-4 w-4 ml-2 inline-block" />;
+    }
+  };
+
+  // Render a sortable column header
+  const renderSortableHeader = (key: SortKey, label: string) => (
+    <div 
+      className="flex items-center cursor-pointer"
+      onClick={() => handleSort(key)}
+    >
+      {label}
+      {getSortIcon(key)}
+    </div>
+  );
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -615,25 +717,39 @@ const Admin = () => {
               <div className="p-6 text-center">Cargando productos...</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-nut-50">
-                    <tr>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Imagen</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Nombre</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Categoría</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Presentación</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Precio</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Stock</th>
-                      <th className="text-left py-3 px-4 font-medium text-nut-700">Descuento</th>
-                      <th className="text-center py-3 px-4 font-medium text-nut-700">Destacado</th>
-                      <th className="text-right py-3 px-4 font-medium text-nut-700">Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-nut-100">
+                <Table>
+                  <TableHeader className="bg-nut-50">
+                    <TableRow>
+                      <TableHead>Imagen</TableHead>
+                      <TableHead>
+                        {renderSortableHeader('name', 'Nombre')}
+                      </TableHead>
+                      <TableHead>
+                        {renderSortableHeader('category', 'Categoría')}
+                      </TableHead>
+                      <TableHead>
+                        {renderSortableHeader('presentation', 'Presentación')}
+                      </TableHead>
+                      <TableHead>
+                        {renderSortableHeader('price', 'Precio')}
+                      </TableHead>
+                      <TableHead>
+                        {renderSortableHeader('stock', 'Stock')}
+                      </TableHead>
+                      <TableHead>
+                        {renderSortableHeader('discount', 'Descuento')}
+                      </TableHead>
+                      <TableHead className="text-center">
+                        {renderSortableHeader('featured', 'Destacado')}
+                      </TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="divide-y divide-nut-100">
                     {filteredProducts.length > 0 ? (
                       filteredProducts.map((product) => (
-                        <tr key={product.id} className="hover:bg-nut-50">
-                          <td className="py-3 px-4">
+                        <TableRow key={product.id} className="hover:bg-nut-50">
+                          <TableCell>
                             {product.image ? (
                               <img 
                                 src={product.image}
@@ -645,22 +761,22 @@ const Admin = () => {
                                 <ImageIcon className="h-5 w-5 text-nut-400" />
                               </div>
                             )}
-                          </td>
-                          <td className="py-3 px-4">{product.name}</td>
-                          <td className="py-3 px-4">
+                          </TableCell>
+                          <TableCell>{product.name}</TableCell>
+                          <TableCell>
                             {product.category ? product.category.name : getCategoryName(product.category_id)}
-                          </td>
-                          <td className="py-3 px-4">{product.presentation || "-"}</td>
-                          <td className="py-3 px-4">${product.price.toLocaleString()}</td>
-                          <td className="py-3 px-4">
+                          </TableCell>
+                          <TableCell>{product.presentation || "-"}</TableCell>
+                          <TableCell>${product.price.toLocaleString()}</TableCell>
+                          <TableCell>
                             <span className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
                               {product.stock}
                             </span>
-                          </td>
-                          <td className="py-3 px-4">
+                          </TableCell>
+                          <TableCell>
                             {product.discount ? `${product.discount}%` : "-"}
-                          </td>
-                          <td className="py-3 px-4 text-center">
+                          </TableCell>
+                          <TableCell className="text-center">
                             <Button
                               variant="ghost"
                               size="icon"
@@ -669,8 +785,8 @@ const Admin = () => {
                             >
                               <Star className="h-4 w-4" fill={product.featured ? "currentColor" : "none"} />
                             </Button>
-                          </td>
-                          <td className="py-3 px-4 text-right">
+                          </TableCell>
+                          <TableCell className="text-right">
                             <div className="flex justify-end gap-2">
                               <Button
                                 variant="ghost"
@@ -697,18 +813,18 @@ const Admin = () => {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                          </td>
-                        </tr>
+                          </TableCell>
+                        </TableRow>
                       ))
                     ) : (
-                      <tr>
-                        <td colSpan={9} className="text-center py-6 text-nut-600">
+                      <TableRow>
+                        <TableCell colSpan={9} className="text-center py-6 text-nut-600">
                           No se encontraron productos con los filtros aplicados
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     )}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             )}
           </div>
