@@ -198,7 +198,6 @@ const Admin = () => {
       if (error) throw error;
       setProductList(data || []);
       
-      // Count featured products
       const featured = data?.filter(p => p.featured) || [];
       setFeaturedCount(featured.length);
     } catch (error) {
