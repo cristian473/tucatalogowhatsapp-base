@@ -23,6 +23,11 @@ const Footer = () => {
     loadFeaturedProducts();
   }, []);
   
+  // Function to create properly encoded category URLs
+  const createCategoryUrl = (category: string) => {
+    return `/productos?category=${encodeURIComponent(category)}`;
+  };
+  
   return (
     <footer className="bg-nut-900 text-white pt-8 pb-4">
       <div className="container mx-auto px-4">
@@ -64,12 +69,12 @@ const Footer = () => {
                 <h3 className="text-base font-bold mb-2">Categorías</h3>
                 <ul className="space-y-1">
                   <li>
-                    <Link to="/productos?categoria=Nueces" className="text-nut-200 text-xs hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Nueces")} className="text-nut-200 text-xs hover:text-white transition-colors">
                       Nueces
                     </Link>
                   </li>
                   <li>
-                    <Link to="/productos?categoria=Almendras" className="text-nut-200 text-xs hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Almendras")} className="text-nut-200 text-xs hover:text-white transition-colors">
                       Almendras
                     </Link>
                   </li>
@@ -127,22 +132,22 @@ const Footer = () => {
                 <h3 className="text-lg font-bold mb-4">Categorías</h3>
                 <ul className="space-y-2">
                   <li>
-                    <Link to="/productos?categoria=Nueces" className="text-nut-200 hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Nueces")} className="text-nut-200 hover:text-white transition-colors">
                       Nueces
                     </Link>
                   </li>
                   <li>
-                    <Link to="/productos?categoria=Almendras" className="text-nut-200 hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Almendras")} className="text-nut-200 hover:text-white transition-colors">
                       Almendras
                     </Link>
                   </li>
                   <li>
-                    <Link to="/productos?categoria=Mix" className="text-nut-200 hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Mix")} className="text-nut-200 hover:text-white transition-colors">
                       Mix de frutos
                     </Link>
                   </li>
                   <li>
-                    <Link to="/productos?categoria=Pistachos" className="text-nut-200 hover:text-white transition-colors">
+                    <Link to={createCategoryUrl("Pistachos")} className="text-nut-200 hover:text-white transition-colors">
                       Pistachos
                     </Link>
                   </li>

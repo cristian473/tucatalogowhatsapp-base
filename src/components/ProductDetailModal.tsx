@@ -3,6 +3,7 @@ import React from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { formatDate } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
 interface Product {
   id: string;
@@ -75,9 +76,11 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, isOpen
                   <TableCell>${product.price.toLocaleString()}</TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className="font-medium">Stock</TableCell>
-                  <TableCell className={product.stock > 0 ? "text-green-600" : "text-red-500"}>
-                    {product.stock}
+                  <TableCell className="font-medium">Disponibilidad</TableCell>
+                  <TableCell>
+                    <Badge variant={product.stock > 0 ? "default" : "destructive"}>
+                      {product.stock > 0 ? "En stock" : "Sin stock"}
+                    </Badge>
                   </TableCell>
                 </TableRow>
                 <TableRow>
