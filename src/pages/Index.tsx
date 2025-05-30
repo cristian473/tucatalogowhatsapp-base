@@ -63,7 +63,7 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/a6169c5e-68c8-4fec-ab92-b1b5dc24489b.png" 
                   alt="Maná frutos-secos Logo" 
-                  className="w-48 h-auto opacity-90 drop-shadow-2xl"
+                  className="w-60 h-auto opacity-90 drop-shadow-2xl"
                 />
               </div>
             </div>
