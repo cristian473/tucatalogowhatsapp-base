@@ -1,11 +1,13 @@
+
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductList from "@/components/ProductList";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { ShoppingCart, Minus, Plus, ChevronLeft } from "lucide-react";
 import { Product } from "@/components/ProductCard";
@@ -15,8 +17,10 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { toast } = useToast();
   const { addToCart } = useCart();
+  const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+  const [productVariants, setProductVariants] = useState<Product[]>([]);
   
   // Get product data using React Query
   const { data: product, isLoading, error } = useQuery({
@@ -67,6 +71,49 @@ const ProductDetail = () => {
     }
   });
   
+  // Get product variants (same name, different presentations)
+  useEffect(() => {
+    const fetchProductVariants = async () => {
+      if (product && product.name) {
+        const { data, error } = await supabase
+          .from("products")
+          .select(`
+            id,
+            name,
+            price,
+            image,
+            stock,
+            discount,
+            presentation,
+            description,
+            category_id,
+            categories:category_id (name)
+          `)
+          .eq("name", product.name)
+          .gt("stock", 0); // Only show variants with stock
+          
+        if (!error && data) {
+          const formatted: Product[] = data.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            image: item.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+            category: item.categories?.name || "Sin categoría",
+            stock: item.stock,
+            discount: item.discount,
+            presentation: item.presentation,
+            description: item.description,
+            category_id: item.category_id
+          }));
+          
+          setProductVariants(formatted);
+        }
+      }
+    };
+    
+    fetchProductVariants();
+  }, [product]);
+  
   // Get related products
   useEffect(() => {
     const fetchRelatedProducts = async () => {
@@ -85,12 +132,13 @@ const ProductDetail = () => {
           `)
           .eq("category_id", product.category_id)
           .neq("id", product.id)
+          .neq("name", product.name) // Exclude variants of the same product
           .limit(4);
           
         if (!error && data) {
           // Format products for our component - make sure we're mapping IDs as strings
           const formatted: Product[] = data.map(item => ({
-            id: item.id, // No need to convert since Supabase already returns id as string
+            id: item.id,
             name: item.name,
             price: item.price,
             image: item.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -112,6 +160,13 @@ const ProductDetail = () => {
   useEffect(() => {
     setQuantity(1);
   }, [id]);
+
+  // Handle presentation change
+  const handlePresentationChange = (variantId: string) => {
+    if (variantId !== id) {
+      navigate(`/producto/${variantId}`);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -208,8 +263,29 @@ const ProductDetail = () => {
               <div className="text-sm text-nut-500 uppercase mb-2">{product.category}</div>
               <h1 className="font-playfair text-3xl font-bold mb-4">{product.name}</h1>
               
-              {/* Presentation Display - Added for clearer visibility */}
-              {product.presentation && (
+              {/* Presentation Selector */}
+              {productVariants.length > 1 && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-nut-700 mb-2">
+                    Presentación:
+                  </label>
+                  <Select value={id} onValueChange={handlePresentationChange}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {productVariants.map((variant) => (
+                        <SelectItem key={variant.id} value={variant.id}>
+                          {variant.presentation || "Sin especificar"} - ${variant.price.toLocaleString()}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {/* Single Presentation Display */}
+              {productVariants.length <= 1 && product.presentation && (
                 <div className="inline-block px-3 py-1.5 bg-nut-50 text-nut-800 rounded-md font-medium mb-4">
                   Presentación: {product.presentation}
                 </div>
