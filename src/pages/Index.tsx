@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -38,21 +39,34 @@ const Index = () => {
       <Header />
       
       <main className="flex-grow">
-        {/* Hero Section with nuts background */}
+        {/* Hero Section with nuts background and logo overlay */}
         <section className="relative bg-[url('/lovable-uploads/2e463fb1-c181-4f9f-881a-8ae2fa36bf44.png')] bg-cover bg-center">
           <div className="absolute inset-0 bg-nut-800/30 backdrop-blur-sm"></div>
-          <div className="container mx-auto px-4 py-24 md:py-32 relative z-10 text-center">
-            <h1 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-4">
-              Los mejores frutos secos
-            </h1>
-            <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl mx-auto">
-              Seleccionados cuidadosamente para ofrecerte calidad premium y sabor excepcional
-            </p>
-            <Link to="/productos">
-              <Button className="bg-nut-700 hover:bg-nut-800 text-lg px-8 py-6">
-                Ver catálogo
-              </Button>
-            </Link>
+          <div className="container mx-auto px-4 py-24 md:py-32 relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="text-center md:text-left md:w-2/3">
+                <h1 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-4">
+                  Los mejores frutos secos
+                </h1>
+                <p className="text-xl md:text-2xl text-white mb-8 max-w-2xl">
+                  Seleccionados cuidadosamente para ofrecerte calidad premium y sabor excepcional
+                </p>
+                <Link to="/productos">
+                  <Button className="bg-nut-700 hover:bg-nut-800 text-lg px-8 py-6">
+                    Ver catálogo
+                  </Button>
+                </Link>
+              </div>
+              
+              {/* Logo overlay on the right */}
+              <div className="hidden md:block md:w-1/3 flex justify-end">
+                <img 
+                  src="/nuez-logo.png" 
+                  alt="Logo Nuez" 
+                  className="w-48 h-auto opacity-90 drop-shadow-2xl"
+                />
+              </div>
+            </div>
           </div>
         </section>
 
