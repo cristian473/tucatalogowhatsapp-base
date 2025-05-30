@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Product } from "@/components/ProductCard";
 import { shuffleArray } from "@/lib/utils";
@@ -70,14 +69,22 @@ export async function getLatestProducts(): Promise<Product[]> {
       created_at
     `)
     .order("created_at", { ascending: false })
-    .limit(4);
+    .limit(20); // Increased limit to have more products to filter from
 
   if (error) {
     console.error("Error fetching latest products:", error);
     return [];
   }
 
-  return formatProductsFromSupabase(data || []);
+  const formattedProducts = formatProductsFromSupabase(data || []);
+  
+  // Filter out duplicates by name, keeping only the first occurrence (most recent)
+  const uniqueProducts = formattedProducts.filter((product, index, array) => 
+    array.findIndex(p => p.name === product.name) === index
+  );
+
+  // Return only 4 unique products
+  return uniqueProducts.slice(0, 4);
 }
 
 function formatProductsFromSupabase(products: any[]): Product[] {
