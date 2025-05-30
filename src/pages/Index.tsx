@@ -61,8 +61,8 @@ const Index = () => {
               {/* Logo overlay on the right */}
               <div className="hidden md:block md:w-1/3 flex justify-end">
                 <img 
-                  src="/nuez-logo.png" 
-                  alt="Logo Nuez" 
+                  src="/lovable-uploads/a6169c5e-68c8-4fec-ab92-b1b5dc24489b.png" 
+                  alt="Maná frutos-secos Logo" 
                   className="w-48 h-auto opacity-90 drop-shadow-2xl"
                 />
               </div>
