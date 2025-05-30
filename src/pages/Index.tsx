@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -79,48 +78,56 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Pecan Benefits Section */}
+        {/* Walnut Benefits Section */}
         <section className="py-16 bg-nut-50">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-8 md:mb-0 md:pr-8">
                 <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-6 text-nut-800">
-                  Los beneficios de las nueces pecan
+                  Los beneficios de las nueces Mariposa
                 </h2>
                 <ul className="space-y-4">
                   <li className="flex items-start">
                     <span className="text-purple-600 font-bold mr-2">✓</span>
-                    <p className="text-nut-700">Efectos Antioxidantes ya que proveen al organismo de fitonutrientes</p>
+                    <p className="text-nut-700">Ricas en Omega-3 que ayuda a reducir colesterol.</p>
                   </li>
                   <li className="flex items-start">
                     <span className="text-purple-600 font-bold mr-2">✓</span>
-                    <p className="text-nut-700">Son ricas en ácidos grasos monoinsaturados que ayudan a reducir el colesterol y reducir todo tipo de enfermedad coronaria</p>
+                    <p className="text-nut-700">Consumir nueces reduce riesgo de padecer cáncer y otras enfermedades coronarias.</p>
                   </li>
                   <li className="flex items-start">
                     <span className="text-purple-600 font-bold mr-2">✓</span>
-                    <p className="text-nut-700">Ayudan a controlar el peso por su capacidad saciante</p>
+                    <p className="text-nut-700">Buenas para la memoria y prevenir enfermedades como el Alzheimer</p>
                   </li>
                   <li className="flex items-start">
                     <span className="text-purple-600 font-bold mr-2">✓</span>
-                    <p className="text-nut-700">Es un alimento libre de sodio, lo que permite su inclusión en dietas bajas en sodio para aportar nutrientes necesarios al organismo</p>
+                    <p className="text-nut-700">Contribuyen a equilibrar peso y mantener intestino en perfectas condiciones.</p>
                   </li>
                   <li className="flex items-start">
                     <span className="text-purple-600 font-bold mr-2">✓</span>
-                    <p className="text-nut-700">No solo contienen muy bajos niveles de azúcar, sino que ayudan a mejorar los niveles de azúcar en sangre de quien las consume con asiduidad</p>
+                    <p className="text-nut-700">Ayuda a reducir enfermedades cardiovasculares.</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Beneficiosas para el sistema nervioso.</p>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="text-purple-600 font-bold mr-2">✓</span>
+                    <p className="text-nut-700">Contienen polifenoles, los cuales tienen efectos antioxidantes.</p>
                   </li>
                 </ul>
                 <div className="mt-6 flex justify-center md:justify-start">
-                  <Link to="/producto/2384502d-1e5d-489e-938e-5469bc3308c9">
+                  <Link to="/productos?category=Nueces">
                     <Button className="bg-nut-700 text-white hover:bg-nut-800">
-                      Ver productos de nuez pecan
+                      Ver productos de nueces Mariposa
                     </Button>
                   </Link>
                 </div>
               </div>
               <div className="md:w-1/2">
                 <img 
-                  src="/lovable-uploads/51e682ab-e61c-4f74-82c2-b6191ebd971c.png" 
-                  alt="Nueces Pecan" 
+                  src="/lovable-uploads/6832abab-06f6-4f61-bc35-3ad4041072ad.png" 
+                  alt="Nueces Mariposa" 
                   className="rounded-lg shadow-lg w-full h-auto object-cover"
                 />
               </div>
