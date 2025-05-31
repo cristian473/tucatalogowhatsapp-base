@@ -42,9 +42,16 @@ const Index = () => {
         {/* Hero Section with nuts background and logo overlay */}
         <section className="relative bg-[url('/lovable-uploads/2e463fb1-c181-4f9f-881a-8ae2fa36bf44.png')] bg-cover bg-center">
           <div className="absolute inset-0 bg-nut-800/30 backdrop-blur-sm"></div>
-          <div className="container mx-auto px-4 py-24 md:py-32 relative z-10">
+          <div className="container mx-auto px-4 py-24 md:py-5 relative z-10">
             <div className="flex items-center justify-between">
-              <div className="text-center md:text-left md:w-2/3">
+              <div className="hidden md:block md:w-1/3 flex justify-end">
+                <img 
+                  src="/lovable-uploads/a6169c5e-68c8-4fec-ab92-b1b5dc24489b.png" 
+                  alt="Maná frutos-secos Logo" 
+                  className="w-80 h-auto opacity-70 drop-shadow-2xl"
+                />
+              </div>
+              <div className="text-center md:text-center md:w-2/3">
                 <h1 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-4">
                   Los mejores frutos secos
                 </h1>
@@ -63,7 +70,7 @@ const Index = () => {
                 <img 
                   src="/lovable-uploads/a6169c5e-68c8-4fec-ab92-b1b5dc24489b.png" 
                   alt="Maná frutos-secos Logo" 
-                  className="w-60 h-auto opacity-90 drop-shadow-2xl"
+                  className="w-80 h-auto opacity-70 drop-shadow-2xl"
                 />
               </div>
             </div>

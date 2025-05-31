@@ -59,7 +59,7 @@ const Products = () => {
         
         // Format products from Supabase - ensure IDs are strings
         const formattedProducts: Product[] = productsData.map(product => ({
-          id: String(product.id), // Ensure ID is explicitly converted to string
+          id: String(product.id),
           name: product.name,
           price: product.price,
           image: product.image || "https://images.unsplash.com/photo-1628697189445-40c1db871df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -440,7 +440,7 @@ const Products = () => {
                   <div className="mb-4 text-sm text-nut-600">
                     Mostrando {filteredProducts.length} productos
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredProducts.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
