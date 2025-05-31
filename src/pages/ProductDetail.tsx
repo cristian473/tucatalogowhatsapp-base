@@ -163,10 +163,8 @@ const ProductDetail = () => {
   }, [id]);
 
   // Handle presentation change
-  const handlePresentationChange = (variantId: string) => {
-    if (variantId !== id) {
-      navigate(`/producto/${variantId}`);
-    }
+  const handlePresentationChange = (selectedProductId: string) => {
+    navigate(`/producto/${selectedProductId.toString()}`);
   };
 
   if (isLoading) {
