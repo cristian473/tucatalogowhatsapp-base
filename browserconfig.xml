@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square70x70logo src="/public/logo-mana-70.png"/>
+            <square150x150logo src="/public/logo-mana-150.png"/>
+            <wide310x150logo src="/public/logo-mana-310x150.png"/>
+            <square310x310logo src="/public/logo-mana-310.png"/>
+            <TileColor>#8B4513</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig>
