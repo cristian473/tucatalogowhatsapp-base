@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
@@ -7,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
-import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star, Filter, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Edit, Trash2, Plus, Image as ImageIcon, Eye, Star, Filter, ArrowUpDown, ArrowUp, ArrowDown, Users } from "lucide-react";
 import AdminLogin from "@/components/AdminLogin";
 import ImageUploader from "@/components/ImageUploader";
 import CategorySelector from "@/components/CategorySelector";
@@ -45,6 +44,12 @@ interface Category {
   name: string;
 }
 
+interface VisitStats {
+  total_visits: number;
+  unique_visits: number;
+  last_visit: string;
+}
+
 type SortKey = 'name' | 'category' | 'presentation' | 'price' | 'stock' | 'discount' | 'featured';
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -67,6 +72,7 @@ const Admin = () => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
+  const [visitStats, setVisitStats] = useState<VisitStats | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -183,6 +189,42 @@ const Admin = () => {
       {getSortIcon(key)}
     </div>
   );
+
+  const fetchVisitStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("site_visits")
+        .select("*");
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        // Contar visitas totales y únicas
+        const totalVisits = data.length;
+        const uniqueVisits = new Set(data.map(visit => visit.visitor_id)).size;
+        const lastVisit = data.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0]?.created_at;
+
+        setVisitStats({
+          total_visits: totalVisits,
+          unique_visits: uniqueVisits,
+          last_visit: lastVisit
+        });
+      } else {
+        setVisitStats({
+          total_visits: 0,
+          unique_visits: 0,
+          last_visit: ""
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching visit stats:", error);
+      setVisitStats({
+        total_visits: 0,
+        unique_visits: 0,
+        last_visit: ""
+      });
+    }
+  };
 
   const fetchProducts = async () => {
     setIsLoading(true);
@@ -402,6 +444,7 @@ const Admin = () => {
     setIsAuthenticated(true);
     fetchProducts();
     fetchCategories();
+    fetchVisitStats();
   };
   
   const handleViewDetail = (product: Product) => {
@@ -470,6 +513,17 @@ const Admin = () => {
     setShowFilters(!showFilters);
   };
 
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "Nunca";
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -494,9 +548,30 @@ const Admin = () => {
       
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8">
-          <h1 className="font-playfair text-3xl md:text-4xl font-bold mb-8">
-            Panel Administrativo
-          </h1>
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-8">
+            <h1 className="font-playfair text-3xl md:text-4xl font-bold mb-4 lg:mb-0">
+              Panel Administrativo
+            </h1>
+            
+            {/* Contador de Visitas */}
+            <div className="bg-white rounded-lg border border-nut-200 p-4 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="bg-nut-100 p-2 rounded-full">
+                  <Users className="h-5 w-5 text-nut-700" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-nut-700 text-sm">Estadísticas de Visitas</h3>
+                  <div className="flex flex-col sm:flex-row sm:gap-4 text-sm text-nut-600">
+                    <span>Total: <strong>{visitStats?.total_visits || 0}</strong></span>
+                    <span>Únicas: <strong>{visitStats?.unique_visits || 0}</strong></span>
+                  </div>
+                  <div className="text-xs text-nut-500 mt-1">
+                    Última: {formatDate(visitStats?.last_visit || "")}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           
           {/* Edit/Create Form */}
           {editingProduct && (

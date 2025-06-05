@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Product } from "@/components/ProductCard";
 import { getFeaturedProducts, getLatestProducts } from "@/services/productService";
+import { useVisitTracker } from "@/hooks/useVisitTracker";
 
 const Index = () => {
+  useVisitTracker('home');
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [newProducts, setNewProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
