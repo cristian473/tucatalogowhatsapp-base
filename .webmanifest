@@ -1,0 +1,9 @@
+{
+    "icons": [
+        {
+            "src": "/assets/logo-mana.png",
+            "sizes": "any",
+            "type": "image/png"
+        }
+    ]
+}

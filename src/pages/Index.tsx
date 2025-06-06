@@ -48,7 +48,7 @@ const Index = () => {
             <div className="flex items-center justify-between">
               <div className="hidden md:block md:w-1/3 flex justify-end">
                 <img 
-                  src="/public/logo-mana.png" 
+                  src="/logo-mana.png" 
                   alt="Maná frutos-secos Logo" 
                   className="w-80 h-auto opacity-70 drop-shadow-2xl"
                 />
@@ -70,7 +70,7 @@ const Index = () => {
               {/* Logo overlay on the right */}
               <div className="hidden md:block md:w-1/3 flex justify-end">
                 <img 
-                  src="/public/logo-mana.png" 
+                  src="/logo-mana.png" 
                   alt="Maná frutos-secos Logo" 
                   className="w-80 h-auto opacity-70 drop-shadow-2xl"
                 />
