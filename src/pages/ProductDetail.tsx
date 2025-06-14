@@ -268,13 +268,13 @@ const ProductDetail = () => {
                   <label className="block text-sm font-medium text-nut-700 mb-2">
                     Presentación:
                   </label>
-                  <Select value={id} onValueChange={handlePresentationChange}>
+                  <Select value={String(id)} onValueChange={handlePresentationChange}>
                     <SelectTrigger className="w-48">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       {productVariants.map((variant) => (
-                        <SelectItem key={variant.id} value={variant.id}>
+                        <SelectItem key={variant.id} value={String(variant.id)}>
                           {variant.presentation || "Sin especificar"} - ${variant.price.toLocaleString()}
                         </SelectItem>
                       ))}
