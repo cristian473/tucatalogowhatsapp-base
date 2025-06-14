@@ -95,11 +95,42 @@ export type Database = {
           },
         ]
       }
+      site_visits: {
+        Row: {
+          created_at: string | null
+          id: string
+          ip_address: unknown | null
+          page: string | null
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          page?: string | null
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          ip_address?: unknown | null
+          page?: string | null
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_old_visits: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       decrement_stock: {
         Args: { product_id: string; quantity: number }
         Returns: number

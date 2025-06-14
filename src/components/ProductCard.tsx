@@ -43,6 +43,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     ? product.price - (product.price * product.discount / 100)
     : product.price;
 
+  // Aseguramos usar el formato español argentino para los precios
+  const formattedFinalPrice = finalPrice.toLocaleString("es-AR");
+  const formattedOriginalPrice = product.price.toLocaleString("es-AR");
+
   // Ensure product.id is properly converted to string
   const productId = String(product.id);
 
@@ -69,9 +73,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         )}
         <div className="flex items-baseline mb-3">
-          <span className="text-lg font-bold text-nut-800">${finalPrice}</span>
+          <span className="text-lg font-bold text-nut-800">${formattedFinalPrice}</span>
           {hasDiscount && (
-            <span className="ml-2 text-sm text-nut-400 line-through">${product.price}</span>
+            <span className="ml-2 text-sm text-nut-400 line-through">${formattedOriginalPrice}</span>
           )}
         </div>
         <div className="flex items-center justify-between">
@@ -98,3 +102,4 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 };
 
 export default ProductCard;
+
