@@ -70,6 +70,9 @@ const ProductDetail = () => {
     }
   });
   
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [])
   // Get product variants (same name, different presentations)
   useEffect(() => {
     const fetchProductVariants = async () => {
