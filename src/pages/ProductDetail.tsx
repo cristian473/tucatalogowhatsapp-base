@@ -164,6 +164,7 @@ const ProductDetail = () => {
 
   // Handle presentation change
   const handlePresentationChange = (selectedProductId: string) => {
+    window.scrollTo(0, 0);
     navigate(`/producto/${selectedProductId.toString()}`);
   };
 
